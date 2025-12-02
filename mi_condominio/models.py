@@ -1,6 +1,6 @@
 from django.db import models
-
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 
 
 class Condominio(models.Model):
@@ -178,6 +178,16 @@ class Usuario(models.Model):
     class EstadoCuenta(models.TextChoices):
         ACTIVO = 'ACTIVO', 'Activo'
         INACTIVO = 'INACTIVO', 'Inactivo'
+
+    # Vinculación con User de Django para autenticación
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='perfil_usuario',
+        null=True,
+        blank=True,
+        help_text='Usuario de Django para autenticación'
+    )
 
     condominio = models.ForeignKey(
         Condominio,

@@ -47,23 +47,58 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#funcionalidades">Funcionalidades</a>
+                        <a class="nav-link" href="{% url 'landing' %}#funcionalidades">Funcionalidades</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#beneficios">Beneficios</a>
+                        <a class="nav-link" href="{% url 'landing' %}#beneficios">Beneficios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#contacto">Contacto</a>
+                        <a class="nav-link" href="{% url 'landing' %}#contacto">Contacto</a>
                     </li>
-                    <li class="nav-item ms-2">
-                        <a class="btn btn-outline-primary" href="{% url 'admin:index' %}">
-                            <i class="bi bi-box-arrow-in-right"></i> Acceder
-                        </a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown ms-2">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                {% if user.is_staff %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                            <i class="bi bi-gear-fill"></i> Panel Admin
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'logout' %}">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-outline-primary" href="{% url 'login' %}">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!-- Main Content -->
     <main>

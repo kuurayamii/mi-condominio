@@ -1,0 +1,83 @@
+/*
+ * Login Page - Estilos personalizados
+ */
+
+/* Contenedor principal del login */
+.login-container {
+    min-height: calc(100vh - 56px); /* Altura total menos navbar */
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+}
+
+/* Card del login */
+.login-container .card {
+    border-radius: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-container .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1.5rem 3rem rgba(0,0,0,.2) !important;
+}
+
+/* Inputs del formulario */
+.login-container .form-control {
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.login-container .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Botón de login */
+.login-container .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.login-container .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(102, 126, 234, 0.4);
+}
+
+/* Links */
+.login-container a {
+    color: #667eea;
+    transition: all 0.3s ease;
+}
+
+.login-container a:hover {
+    color: #764ba2;
+    text-decoration: underline !important;
+}
+
+/* Alertas */
+.login-container .alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* Iconos */
+.login-container .bi {
+    transition: all 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 1rem;
+    }
+
+    .login-container .card-body {
+        padding: 2rem !important;
+    }
+}
