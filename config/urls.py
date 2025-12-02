@@ -20,6 +20,8 @@ from django.urls import include, path
 
 
 urlpatterns = [
-    path("mi_condominio/", include("mi_condominio.urls")),
+    # TODO: Borrar esta línea después cuando ya no sea necesaria
+    # path("mi_condominio/", include("mi_condominio.urls")),
+    path("", include("mi_condominio.urls")),  # Landing page en la raíz
     path('admin/', admin.site.urls),
 ]

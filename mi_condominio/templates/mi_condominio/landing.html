@@ -1,0 +1,365 @@
+{% extends 'mi_condominio/base.html' %}
+{% load static %}
+
+{% block title %}Mi Condominio - Gestión Integral de Condominios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'mi_condominio/css/landing.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-4">
+                    Gestiona tu condominio de forma simple y eficiente
+                </h1>
+                <p class="lead mb-4">
+                    Sistema integral para administradores de condominios. Gestiona incidencias, reuniones, amonestaciones y más, todo en un solo lugar.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#contacto" class="btn btn-light btn-lg">
+                        <i class="bi bi-envelope"></i> Solicitar Demo
+                    </a>
+                    <a href="#funcionalidades" class="btn btn-outline-light btn-lg">
+                        Conocer Más
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="p-4">
+                    <i class="bi bi-building display-1" style="font-size: 15rem; opacity: 0.2;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-check-circle-fill text-success display-4"></i>
+                        <h3 class="fw-bold mt-3">100%</h3>
+                        <p class="text-muted">Digital</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-speedometer2 text-primary display-4"></i>
+                        <h3 class="fw-bold mt-3">Rápido</h3>
+                        <p class="text-muted">Gestión ágil</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-shield-check text-info display-4"></i>
+                        <h3 class="fw-bold mt-3">Seguro</h3>
+                        <p class="text-muted">Datos protegidos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up text-warning display-4"></i>
+                        <h3 class="fw-bold mt-3">Eficiente</h3>
+                        <p class="text-muted">Ahorra tiempo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Funcionalidades Section -->
+<section id="funcionalidades" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Funcionalidades Principales</h2>
+            <p class="text-muted lead">Todo lo que necesitas para gestionar tu condominio</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Gestión de Incidencias -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-danger bg-opacity-10 p-3 rounded-3">
+                                <i class="bi bi-exclamation-triangle-fill text-danger fs-2"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">Gestión de Incidencias</h4>
+                        <p class="text-muted">
+                            Registra, da seguimiento y resuelve incidencias de forma eficiente.
+                            Prioriza problemas y mantén un historial completo con evidencias fotográficas.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Control de estado y prioridad</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Geolocalización de reportes</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Evidencias multimedia</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reuniones -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-3">
+                                <i class="bi bi-calendar-event-fill text-primary fs-2"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">Gestión de Reuniones</h4>
+                        <p class="text-muted">
+                            Programa y administra reuniones ordinarias, extraordinarias e informativas.
+                            Almacena actas y mantén un registro histórico completo.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Tipos de reunión configurables</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Actas digitales</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Historial completo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amonestaciones -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded-3">
+                                <i class="bi bi-file-earmark-text-fill text-warning fs-2"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">Control de Amonestaciones</h4>
+                        <p class="text-muted">
+                            Registra y gestiona sanciones de forma ordenada.
+                            Control de multas con fechas límite de pago y seguimiento completo.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Tipos de sanción</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Gestión de multas</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Trazabilidad completa</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bitácoras -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-info bg-opacity-10 p-3 rounded-3">
+                                <i class="bi bi-journal-text text-info fs-2"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">Bitácoras de Seguimiento</h4>
+                        <p class="text-muted">
+                            Registra cada acción y actualización de incidencias.
+                            Mantén un historial detallado de todo lo que ocurre.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Registro automático</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Trazabilidad completa</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Historial detallado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuarios -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-opacity-10 p-3 rounded-3">
+                                <i class="bi bi-people-fill text-success fs-2"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">Gestión de Usuarios</h4>
+                        <p class="text-muted">
+                            Administra usuarios con diferentes roles: administradores, supervisores y conserjes.
+                            Control de acceso y permisos personalizados.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Roles y permisos</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Seguridad avanzada</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Multi-condominio</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-dark bg-opacity-10 p-3 rounded-3">
+                                <i class="bi bi-bar-chart-fill text-dark fs-2"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">Reportes y Estadísticas</h4>
+                        <p class="text-muted">
+                            Visualiza datos en tiempo real con gráficos y reportes.
+                            Toma decisiones informadas basadas en estadísticas.
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Dashboard interactivo</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Gráficos en tiempo real</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Exportar reportes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Beneficios Section -->
+<section id="beneficios" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">¿Por qué elegir Mi Condominio?</h2>
+            <p class="text-muted lead">Beneficios que transformarán la gestión de tu condominio</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-primary bg-opacity-10 d-inline-flex p-4 rounded-circle mb-3">
+                        <i class="bi bi-clock-history text-primary fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Ahorra Tiempo</h5>
+                    <p class="text-muted">Automatiza procesos y reduce tareas administrativas repetitivas</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-success bg-opacity-10 d-inline-flex p-4 rounded-circle mb-3">
+                        <i class="bi bi-currency-dollar text-success fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Reduce Costos</h5>
+                    <p class="text-muted">Elimina papelería y optimiza recursos de gestión</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-info bg-opacity-10 d-inline-flex p-4 rounded-circle mb-3">
+                        <i class="bi bi-graph-up-arrow text-info fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Mejora Eficiencia</h5>
+                    <p class="text-muted">Gestiona múltiples condominios desde un solo lugar</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="bg-warning bg-opacity-10 d-inline-flex p-4 rounded-circle mb-3">
+                        <i class="bi bi-people text-warning fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold">Mejor Comunicación</h5>
+                    <p class="text-muted">Centraliza información y mejora la transparencia</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center py-5">
+        <h2 class="display-5 fw-bold mb-4">¿Listo para transformar la gestión de tu condominio?</h2>
+        <p class="lead mb-4">Únete a los administradores que ya confían en Mi Condominio</p>
+        <a href="#contacto" class="btn btn-light btn-lg">
+            <i class="bi bi-envelope"></i> Solicitar Demostración Gratuita
+        </a>
+    </div>
+</section>
+
+<!-- Contacto Section -->
+<section id="contacto" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <h2 class="display-6 fw-bold mb-4">Contáctanos</h2>
+                <p class="lead text-muted mb-4">
+                    ¿Tienes preguntas? Estamos aquí para ayudarte. Completa el formulario y te responderemos a la brevedad.
+                </p>
+                <div class="d-flex align-items-start mb-3">
+                    <i class="bi bi-envelope-fill text-primary fs-4 me-3"></i>
+                    <div>
+                        <h5 class="fw-bold mb-1">Email</h5>
+                        <p class="text-muted mb-0">info@micondominio.cl</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start mb-3">
+                    <i class="bi bi-telephone-fill text-primary fs-4 me-3"></i>
+                    <div>
+                        <h5 class="fw-bold mb-1">Teléfono</h5>
+                        <p class="text-muted mb-0">+56 9 1234 5678</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-geo-alt-fill text-primary fs-4 me-3"></i>
+                    <div>
+                        <h5 class="fw-bold mb-1">Ubicación</h5>
+                        <p class="text-muted mb-0">Santiago, Chile</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <form>
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label fw-bold">Nombre completo</label>
+                                <input type="text" class="form-control" id="nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label fw-bold">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono">
+                            </div>
+                            <div class="mb-3">
+                                <label for="mensaje" class="form-label fw-bold">Mensaje</label>
+                                <textarea class="form-control" id="mensaje" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-send"></i> Enviar Mensaje
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+{% endblock %}
