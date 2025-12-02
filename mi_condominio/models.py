@@ -232,10 +232,6 @@ class Usuario(models.Model):
         help_text='Dirección de residencia'
     )
 
-    contrasena_hash = models.CharField(
-        max_length=255,
-        help_text='Contraseña cifrada'
-    )
 
     tipo_usuario = models.CharField(
         max_length=10,

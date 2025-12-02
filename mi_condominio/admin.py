@@ -64,10 +64,6 @@ class UsuarioAdmin(admin.ModelAdmin):
         ('Información del Sistema', {
             'fields': ('condominio', 'tipo_usuario', 'estado_cuenta')
         }),
-        ('Seguridad', {
-            'fields': ('contrasena_hash',),
-            'description': 'No edites este campo directamente. Usa los métodos set_password() y check_password()'
-        }),
     )
 
     readonly_fields = ['created_at', 'updated_at']
