@@ -29,7 +29,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'¡Bienvenido {user.username}!')
-            next_url = request.GET.get('next', 'landing')
+            next_url = request.GET.get('next', 'dashboard')
             return redirect(next_url)
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
@@ -46,4 +46,20 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Has cerrado sesión exitosamente.')
     return redirect('landing')
+
+
+@login_required
+def dashboard(request):
+    """
+    Vista principal del dashboard.
+    Muestra estadísticas y gráficos del sistema.
+    """
+    # TODO: Agregar lógica para obtener estadísticas reales de la base de datos
+    context = {
+        'total_condominios': 0,
+        'total_usuarios': 0,
+        'incidencias_abiertas': 0,
+        'reuniones_proximas': 0,
+    }
+    return render(request, 'mi_condominio/dashboard/dashboard.html', context)
 

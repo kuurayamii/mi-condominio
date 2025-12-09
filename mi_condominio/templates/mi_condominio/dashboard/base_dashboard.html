@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard - Mi Condominio{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'mi_condominio/css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="sidebar-brand">
+                        <i class="bi bi-building"></i>
+                        <span class="brand-text">Mi Condominio</span>
+                    </div>
+                    <button class="btn btn-link text-white d-lg-none" id="sidebarClose">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-body">
+                <nav class="sidebar-nav">
+                    <!-- Dashboard -->
+                    <div class="nav-section">
+                        <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
+
+                    <!-- Gestión de Condominios -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Gestión</div>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-building"></i>
+                            <span>Condominios</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-people"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Reuniones</span>
+                        </a>
+                    </div>
+
+                    <!-- Incidencias y Reportes -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Reportes</div>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span>Incidencias</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-journal-text"></i>
+                            <span>Bitácora</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-file-earmark-image"></i>
+                            <span>Evidencias</span>
+                        </a>
+                    </div>
+
+                    <!-- Administración -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Administración</div>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-tags"></i>
+                            <span>Categorías</span>
+                        </a>
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-shield-exclamation"></i>
+                            <span>Amonestaciones</span>
+                        </a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin:index' %}" class="nav-link">
+                            <i class="bi bi-gear-fill"></i>
+                            <span>Panel Admin</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{ user.username }}</div>
+                        <div class="user-role">
+                            {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <button class="btn btn-link" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h5 class="page-title mb-0">{% block page_title %}Dashboard{% endblock %}</h5>
+                </div>
+                <div class="navbar-right">
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="d-none d-md-inline">{{ user.username }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-person"></i> Mi Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-gear"></i> Configuración
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Messages -->
+                {% if messages %}
+                    <div class="mb-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Custom Dashboard JS -->
+    <script src="{% static 'mi_condominio/js/dashboard.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
