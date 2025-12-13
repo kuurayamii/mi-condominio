@@ -50,7 +50,7 @@
                     <!-- Gestión de Condominios -->
                     <div class="nav-section">
                         <div class="nav-section-title">Gestión</div>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'condominio_list' %}" class="nav-link {% if request.resolver_match.url_name == 'condominio_list' or request.resolver_match.url_name == 'condominio_create' or request.resolver_match.url_name == 'condominio_edit' or request.resolver_match.url_name == 'condominio_delete' %}active{% endif %}">
                             <i class="bi bi-building"></i>
                             <span>Condominios</span>
                         </a>

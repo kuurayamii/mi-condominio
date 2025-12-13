@@ -1,0 +1,184 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Condominio - Mi Condominio{% endblock %}
+{% block page_title %}{{ action }} Condominio{% endblock %}
+
+{% block content %}
+<div class="condominio-form-content">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'condominio_list' %}">Condominios</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building me-2"></i>
+                        {{ action }} Condominio
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <!-- RUT -->
+                            <div class="col-md-6">
+                                <label for="rut" class="form-label">
+                                    RUT <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="rut"
+                                    name="rut"
+                                    placeholder="12.345.678-9"
+                                    value="{% if condominio %}{{ condominio.rut }}{% endif %}"
+                                    required
+                                    maxlength="10"
+                                >
+                                <div class="form-text">
+                                    Formato sin puntos ni guión (ej: 123456789)
+                                </div>
+                            </div>
+
+                            <!-- Email de contacto -->
+                            <div class="col-md-6">
+                                <label for="mail_contacto" class="form-label">
+                                    Email de Contacto <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="mail_contacto"
+                                    name="mail_contacto"
+                                    placeholder="contacto@condominio.cl"
+                                    value="{% if condominio %}{{ condominio.mail_contacto }}{% endif %}"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Nombre -->
+                            <div class="col-12">
+                                <label for="nombre" class="form-label">
+                                    Nombre del Condominio <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nombre"
+                                    name="nombre"
+                                    placeholder="Ej: Condominio Los Robles"
+                                    value="{% if condominio %}{{ condominio.nombre }}{% endif %}"
+                                    required
+                                    maxlength="140"
+                                >
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-12">
+                                <label for="direccion" class="form-label">
+                                    Dirección <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="direccion"
+                                    name="direccion"
+                                    placeholder="Ej: Av. Libertador Bernardo O'Higgins 123"
+                                    value="{% if condominio %}{{ condominio.direccion }}{% endif %}"
+                                    required
+                                    maxlength="255"
+                                >
+                            </div>
+
+                            <!-- Región -->
+                            <div class="col-md-6">
+                                <label for="region" class="form-label">
+                                    Región <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="region" name="region" required>
+                                    <option value="">Seleccione una región</option>
+                                    <option value="Región de Arica y Parinacota" {% if condominio and condominio.region == "Región de Arica y Parinacota" %}selected{% endif %}>Región de Arica y Parinacota</option>
+                                    <option value="Región de Tarapacá" {% if condominio and condominio.region == "Región de Tarapacá" %}selected{% endif %}>Región de Tarapacá</option>
+                                    <option value="Región de Antofagasta" {% if condominio and condominio.region == "Región de Antofagasta" %}selected{% endif %}>Región de Antofagasta</option>
+                                    <option value="Región de Atacama" {% if condominio and condominio.region == "Región de Atacama" %}selected{% endif %}>Región de Atacama</option>
+                                    <option value="Región de Coquimbo" {% if condominio and condominio.region == "Región de Coquimbo" %}selected{% endif %}>Región de Coquimbo</option>
+                                    <option value="Región de Valparaíso" {% if condominio and condominio.region == "Región de Valparaíso" %}selected{% endif %}>Región de Valparaíso</option>
+                                    <option value="Región Metropolitana" {% if condominio and condominio.region == "Región Metropolitana" %}selected{% endif %}>Región Metropolitana</option>
+                                    <option value="Región del Libertador General Bernardo O'Higgins" {% if condominio and condominio.region == "Región del Libertador General Bernardo O'Higgins" %}selected{% endif %}>Región del Libertador General Bernardo O'Higgins</option>
+                                    <option value="Región del Maule" {% if condominio and condominio.region == "Región del Maule" %}selected{% endif %}>Región del Maule</option>
+                                    <option value="Región de Ñuble" {% if condominio and condominio.region == "Región de Ñuble" %}selected{% endif %}>Región de Ñuble</option>
+                                    <option value="Región del Biobío" {% if condominio and condominio.region == "Región del Biobío" %}selected{% endif %}>Región del Biobío</option>
+                                    <option value="Región de La Araucanía" {% if condominio and condominio.region == "Región de La Araucanía" %}selected{% endif %}>Región de La Araucanía</option>
+                                    <option value="Región de Los Ríos" {% if condominio and condominio.region == "Región de Los Ríos" %}selected{% endif %}>Región de Los Ríos</option>
+                                    <option value="Región de Los Lagos" {% if condominio and condominio.region == "Región de Los Lagos" %}selected{% endif %}>Región de Los Lagos</option>
+                                    <option value="Región de Aysén" {% if condominio and condominio.region == "Región de Aysén" %}selected{% endif %}>Región de Aysén</option>
+                                    <option value="Región de Magallanes" {% if condominio and condominio.region == "Región de Magallanes" %}selected{% endif %}>Región de Magallanes</option>
+                                </select>
+                            </div>
+
+                            <!-- Comuna -->
+                            <div class="col-md-6">
+                                <label for="comuna" class="form-label">
+                                    Comuna <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="comuna"
+                                    name="comuna"
+                                    placeholder="Ej: Santiago"
+                                    value="{% if condominio %}{{ condominio.comuna }}{% endif %}"
+                                    required
+                                    maxlength="50"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a href="{% url 'condominio_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Condominio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            {% if condominio %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>Información del Registro
+                    </h6>
+                    <div class="row text-muted small">
+                        <div class="col-md-6">
+                            <strong>Creado:</strong> {{ condominio.created_at|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Última actualización:</strong> {{ condominio.updated_at|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
