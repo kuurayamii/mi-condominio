@@ -1,0 +1,293 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Usuario - Mi Condominio{% endblock %}
+{% block page_title %}{{ action }} Usuario{% endblock %}
+
+{% block content %}
+<div class="usuario-form-content">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'usuario_list' %}">Usuarios</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person me-2"></i>
+                        {{ action }} Usuario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Información Personal -->
+                        <h6 class="mb-3 text-primary">
+                            <i class="bi bi-person-badge me-2"></i>Información Personal
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <!-- Nombres -->
+                            <div class="col-md-6">
+                                <label for="nombres" class="form-label">
+                                    Nombres <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nombres"
+                                    name="nombres"
+                                    placeholder="Ej: Juan Carlos"
+                                    value="{% if usuario %}{{ usuario.nombres }}{% endif %}"
+                                    required
+                                    maxlength="200"
+                                >
+                            </div>
+
+                            <!-- Apellido -->
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label">
+                                    Apellido <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="apellido"
+                                    name="apellido"
+                                    placeholder="Ej: González Pérez"
+                                    value="{% if usuario %}{{ usuario.apellido }}{% endif %}"
+                                    required
+                                    maxlength="200"
+                                >
+                            </div>
+
+                            <!-- RUT -->
+                            <div class="col-md-4">
+                                <label for="rut" class="form-label">
+                                    RUT <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="rut"
+                                    name="rut"
+                                    placeholder="12345678-9"
+                                    value="{% if usuario %}{{ usuario.rut }}{% endif %}"
+                                    required
+                                    maxlength="10"
+                                >
+                                <div class="form-text">
+                                    Formato sin puntos ni guión
+                                </div>
+                            </div>
+
+                            <!-- Género -->
+                            <div class="col-md-4">
+                                <label for="genero" class="form-label">
+                                    Género
+                                </label>
+                                <select class="form-select" id="genero" name="genero">
+                                    <option value="">Seleccione (opcional)</option>
+                                    {% for value, label in generos %}
+                                        <option value="{{ value }}"
+                                            {% if usuario and usuario.genero == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Correo -->
+                            <div class="col-md-4">
+                                <label for="correo" class="form-label">
+                                    Correo Electrónico <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="correo"
+                                    name="correo"
+                                    placeholder="usuario@ejemplo.com"
+                                    value="{% if usuario %}{{ usuario.correo }}{% endif %}"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Residencia -->
+                            <div class="col-12">
+                                <label for="residencia" class="form-label">
+                                    Dirección de Residencia
+                                </label>
+                                <textarea
+                                    class="form-control"
+                                    id="residencia"
+                                    name="residencia"
+                                    rows="2"
+                                    placeholder="Dirección completa..."
+                                >{% if usuario %}{{ usuario.residencia }}{% endif %}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Información del Sistema -->
+                        <h6 class="mb-3 text-primary">
+                            <i class="bi bi-gear me-2"></i>Información del Sistema
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <!-- Condominio -->
+                            <div class="col-md-4">
+                                <label for="condominio" class="form-label">
+                                    Condominio <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="condominio" name="condominio" required>
+                                    <option value="">Seleccione un condominio</option>
+                                    {% for condo in condominios %}
+                                        <option value="{{ condo.pk }}"
+                                            {% if usuario and usuario.condominio.pk == condo.pk %}selected{% endif %}>
+                                            {{ condo.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Tipo de Usuario -->
+                            <div class="col-md-4">
+                                <label for="tipo_usuario" class="form-label">
+                                    Tipo de Usuario <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="tipo_usuario" name="tipo_usuario" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    {% for value, label in tipos_usuario %}
+                                        <option value="{{ value }}"
+                                            {% if usuario and usuario.tipo_usuario == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Estado de Cuenta -->
+                            <div class="col-md-4">
+                                <label for="estado_cuenta" class="form-label">
+                                    Estado de Cuenta <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="estado_cuenta" name="estado_cuenta" required>
+                                    {% for value, label in estados_cuenta %}
+                                        <option value="{{ value }}"
+                                            {% if usuario and usuario.estado_cuenta == value %}selected{% elif not usuario and value == "ACTIVO" %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Credenciales de Acceso -->
+                        <h6 class="mb-3 text-primary">
+                            <i class="bi bi-key me-2"></i>Credenciales de Acceso
+                        </h6>
+                        <div class="row g-3">
+                            <!-- Nombre de Usuario -->
+                            {% if not usuario %}
+                            <div class="col-md-6">
+                                <label for="username" class="form-label">
+                                    Nombre de Usuario <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="username"
+                                    name="username"
+                                    placeholder="usuario123"
+                                    required
+                                    maxlength="150"
+                                >
+                                <div class="form-text">
+                                    Usado para iniciar sesión en el sistema
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Nombre de Usuario
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="{% if usuario.user %}{{ usuario.user.username }}{% else %}No asignado{% endif %}"
+                                    disabled
+                                >
+                                <div class="form-text">
+                                    El nombre de usuario no se puede cambiar
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Contraseña -->
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">
+                                    Contraseña {% if not usuario %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="password"
+                                    name="password"
+                                    placeholder="{% if usuario %}Dejar en blanco para no cambiar{% else %}Mínimo 8 caracteres{% endif %}"
+                                    {% if not usuario %}required{% endif %}
+                                    minlength="8"
+                                >
+                                <div class="form-text">
+                                    {% if usuario %}
+                                        Dejar en blanco si no desea cambiar la contraseña
+                                    {% else %}
+                                        Mínimo 8 caracteres
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a href="{% url 'usuario_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Usuario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            {% if usuario %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>Información del Registro
+                    </h6>
+                    <div class="row text-muted small">
+                        <div class="col-md-6">
+                            <strong>Creado:</strong> {{ usuario.created_at|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Última actualización:</strong> {{ usuario.updated_at|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

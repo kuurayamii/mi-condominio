@@ -1,0 +1,97 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Registro de Bitácora - Mi Condominio{% endblock %}
+{% block page_title %}{{ action }} Registro de Bitácora{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'bitacora_list' %}">Bitácora</a></li>
+            <li class="breadcrumb-item active">{{ action }} Registro</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">{{ action }} Registro de Bitácora</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Incidencia asociada -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Incidencia Asociada</h6>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="incidencia" class="form-label">Incidencia <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="incidencia" name="incidencia" required>
+                                        <option value="">Seleccione una incidencia</option>
+                                        {% for inc in incidencias %}
+                                        <option value="{{ inc.id }}"
+                                                {% if bitacora and bitacora.incidencia.id == inc.id %}selected{% endif %}>
+                                            #{{ inc.id }} - {{ inc.titulo }} ({{ inc.condominio.nombre }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información del registro -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Información del Registro</h6>
+                            <div class="row">
+                                <!-- Acción -->
+                                <div class="col-12 mb-3">
+                                    <label for="accion" class="form-label">Acción</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="accion"
+                                           name="accion"
+                                           value="{{ bitacora.accion|default:'' }}"
+                                           placeholder="Ej: Cambio de estado, Asignación de técnico, Contacto con proveedor...">
+                                    <small class="text-muted">Acción realizada o tipo de actualización</small>
+                                </div>
+
+                                <!-- Detalle -->
+                                <div class="col-12 mb-3">
+                                    <label for="detalle" class="form-label">Detalle</label>
+                                    <textarea class="form-control"
+                                              id="detalle"
+                                              name="detalle"
+                                              rows="5"
+                                              placeholder="Descripción detallada del registro, observaciones, notas...">{{ bitacora.detalle|default:'' }}</textarea>
+                                    <small class="text-muted">Información adicional sobre la acción realizada</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Nota:</strong> La fecha del registro se establece automáticamente al momento de la creación.
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'bitacora_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Registro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

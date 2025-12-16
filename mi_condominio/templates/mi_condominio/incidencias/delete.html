@@ -1,0 +1,204 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Eliminar Incidencia - Mi Condominio{% endblock %}
+{% block page_title %}Eliminar Incidencia{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'incidencia_list' %}">Incidencias</a></li>
+            <li class="breadcrumb-item active">Eliminar Incidencia</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario de confirmación -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer. Todos los datos relacionados con esta incidencia serán eliminados permanentemente.
+                    </div>
+
+                    <h6 class="mb-3">¿Está seguro que desea eliminar la siguiente incidencia?</h6>
+
+                    <!-- Información de la incidencia -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>ID:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    #{{ incidencia.id }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Título:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.titulo }}
+                                </div>
+                            </div>
+
+                            {% if incidencia.descripcion %}
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Descripción:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.descripcion }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Condominio:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.condominio.nombre }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Categoría:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    <span class="badge bg-secondary">
+                                        {{ incidencia.tipo_incidencia.nombre_categoria_incidencia }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Estado:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {% if incidencia.estado == 'PENDIENTE' %}
+                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                    {% elif incidencia.estado == 'EN_PROCESO' %}
+                                        <span class="badge bg-info text-dark">En Proceso</span>
+                                    {% elif incidencia.estado == 'RESUELTA' %}
+                                        <span class="badge bg-success">Resuelta</span>
+                                    {% elif incidencia.estado == 'CERRADA' %}
+                                        <span class="badge bg-dark">Cerrada</span>
+                                    {% elif incidencia.estado == 'CANCELADA' %}
+                                        <span class="badge bg-secondary">Cancelada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Prioridad:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {% if incidencia.prioridad == 'URGENTE' %}
+                                        <span class="badge bg-danger">Urgente</span>
+                                    {% elif incidencia.prioridad == 'ALTA' %}
+                                        <span class="badge bg-warning text-dark">Alta</span>
+                                    {% elif incidencia.prioridad == 'MEDIA' %}
+                                        <span class="badge bg-info text-dark">Media</span>
+                                    {% elif incidencia.prioridad == 'BAJA' %}
+                                        <span class="badge bg-secondary">Baja</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Reportado por:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.usuario_reporta.nombres }} {{ incidencia.usuario_reporta.apellido }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Fecha de Reporte:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.fecha_reporte|date:"d/m/Y" }}
+                                </div>
+                            </div>
+
+                            {% if incidencia.fecha_cierre %}
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Fecha de Cierre:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.fecha_cierre|date:"d/m/Y" }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if incidencia.direccion_condominio_incidencia %}
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Dirección:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.direccion_condominio_incidencia }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if incidencia.ubicacion_latitud_reporte and incidencia.ubicacion_longitud_reporte %}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong>Coordenadas:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ incidencia.ubicacion_latitud_reporte }}, {{ incidencia.ubicacion_longitud_reporte }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Advertencias adicionales -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Nota:</strong> Al eliminar esta incidencia también se eliminarán:
+                        <ul class="mb-0 mt-2">
+                            <li>Todos los registros de bitácora asociados</li>
+                            <li>Todas las evidencias vinculadas</li>
+                        </ul>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'incidencia_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Sí, Eliminar Incidencia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

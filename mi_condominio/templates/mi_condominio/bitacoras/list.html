@@ -1,0 +1,144 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Bitácora - Mi Condominio{% endblock %}
+{% block page_title %}Bitácora de Incidencias{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header con botón de crear -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Bitácora de Seguimiento</h4>
+            <p class="text-muted mb-0">Registros de acciones y actualizaciones sobre incidencias</p>
+        </div>
+        <a href="{% url 'bitacora_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Registro
+        </a>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <!-- Búsqueda -->
+                <div class="col-md-6">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Detalle, acción, incidencia..."
+                           value="{{ search_query }}">
+                </div>
+
+                <!-- Filtro por incidencia -->
+                <div class="col-md-4">
+                    <label class="form-label">Incidencia</label>
+                    <select name="incidencia" class="form-select">
+                        <option value="">Todas las incidencias</option>
+                        {% for incidencia in incidencias %}
+                        <option value="{{ incidencia.id }}" {% if incidencia_id == incidencia.id|stringformat:"s" %}selected{% endif %}>
+                            #{{ incidencia.id }} - {{ incidencia.titulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-2"></i>Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de bitácoras -->
+    <div class="card">
+        <div class="card-body">
+            {% if bitacoras %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Incidencia</th>
+                                <th>Acción</th>
+                                <th>Detalle</th>
+                                <th>Fecha</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bitacora in bitacoras %}
+                            <tr>
+                                <td><strong>#{{ bitacora.id }}</strong></td>
+                                <td>
+                                    <div>
+                                        <strong>#{{ bitacora.incidencia.id }} - {{ bitacora.incidencia.titulo }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            <i class="bi bi-building me-1"></i>
+                                            {{ bitacora.incidencia.condominio.nombre }}
+                                        </small>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if bitacora.accion %}
+                                        <span class="badge bg-primary">{{ bitacora.accion|truncatewords:5 }}</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if bitacora.detalle %}
+                                        {{ bitacora.detalle|truncatewords:15 }}
+                                    {% else %}
+                                        <span class="text-muted">Sin detalle</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    {{ bitacora.fecha_bitacora|date:"d/m/Y" }}
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'bitacora_edit' bitacora.pk %}"
+                                           class="btn btn-outline-primary"
+                                           title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'bitacora_delete' bitacora.pk %}"
+                                           class="btn btn-outline-danger"
+                                           title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-text" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3 mb-0">No se encontraron registros de bitácora</p>
+                    {% if search_query or incidencia_id %}
+                        <small class="text-muted">Intenta ajustar los filtros de búsqueda</small>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <p class="text-muted mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Total de registros: <strong>{{ bitacoras|length }}</strong>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

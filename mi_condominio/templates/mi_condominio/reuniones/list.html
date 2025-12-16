@@ -1,0 +1,179 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Reuniones - Mi Condominio{% endblock %}
+{% block page_title %}Gestión de Reuniones{% endblock %}
+
+{% block content %}
+<div class="reuniones-content">
+    <!-- Header con botón de crear -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Listado de Reuniones</h4>
+            <p class="text-muted mb-0">Administra todas las reuniones programadas</p>
+        </div>
+        <a href="{% url 'reunion_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Reunión
+        </a>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{% url 'reunion_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="search"
+                                placeholder="Buscar por nombre, motivo o lugar..."
+                                value="{{ search_query }}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <select class="form-select" name="condominio">
+                            <option value="">Todos los condominios</option>
+                            {% for condo in condominios %}
+                                <option value="{{ condo.pk }}" {% if condominio_id == condo.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ condo.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de reuniones -->
+    <div class="card">
+        <div class="card-body">
+            {% if reuniones %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Condominio</th>
+                                <th>Lugar</th>
+                                <th>Motivo</th>
+                                <th class="text-center">Acta</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reunion in reuniones %}
+                            <tr>
+                                <td>
+                                    <strong>{{ reunion.fecha_reunion|date:"d/m/Y" }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        {% if reunion.fecha_reunion >= today %}
+                                            <span class="badge bg-success">Próxima</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Pasada</span>
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong>{{ reunion.nombre_reunion }}</strong>
+                                </td>
+                                <td>
+                                    {% if reunion.tipo_reunion == "ORDINARIA" %}
+                                        <span class="badge bg-primary">{{ reunion.get_tipo_reunion_display }}</span>
+                                    {% elif reunion.tipo_reunion == "EXTRAORDINARIA" %}
+                                        <span class="badge bg-warning text-dark">{{ reunion.get_tipo_reunion_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info">{{ reunion.get_tipo_reunion_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ reunion.condominio.nombre }}</td>
+                                <td>{{ reunion.lugar_reunion|default:"No especificado" }}</td>
+                                <td>
+                                    {% if reunion.motivo_reunion %}
+                                        {{ reunion.motivo_reunion|truncatewords:10 }}
+                                    {% else %}
+                                        <span class="text-muted">Sin motivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if reunion.acta_reunion_url %}
+                                        <a href="{{ reunion.acta_reunion_url }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Ver acta">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a
+                                            href="{% url 'reunion_edit' reunion.pk %}"
+                                            class="btn btn-sm btn-outline-primary"
+                                            title="Editar"
+                                        >
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a
+                                            href="{% url 'reunion_delete' reunion.pk %}"
+                                            class="btn btn-sm btn-outline-danger"
+                                            title="Eliminar"
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Información de resultados -->
+                <div class="mt-3">
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Mostrando {{ reuniones.count }} reunión{{ reuniones.count|pluralize:"es" }}
+                    </p>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-event" style="font-size: 4rem; color: #cbd5e1;"></i>
+                    <h5 class="mt-3 text-muted">No se encontraron reuniones</h5>
+                    {% if search_query or condominio_id %}
+                        <p class="text-muted">No hay resultados para los filtros aplicados</p>
+                        <a href="{% url 'reunion_list' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar filtros
+                        </a>
+                    {% else %}
+                        <p class="text-muted">Comienza creando tu primera reunión</p>
+                        <a href="{% url 'reunion_create' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Crear Reunión
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Obtener la fecha de hoy para mostrar en el template
+    const today = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

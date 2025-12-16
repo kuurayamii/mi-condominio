@@ -1,0 +1,186 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Reunión - Mi Condominio{% endblock %}
+{% block page_title %}{{ action }} Reunión{% endblock %}
+
+{% block content %}
+<div class="reunion-form-content">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'reunion_list' %}">Reuniones</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-event me-2"></i>
+                        {{ action }} Reunión
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <!-- Condominio -->
+                            <div class="col-md-6">
+                                <label for="condominio" class="form-label">
+                                    Condominio <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="condominio" name="condominio" required>
+                                    <option value="">Seleccione un condominio</option>
+                                    {% for condo in condominios %}
+                                        <option value="{{ condo.pk }}"
+                                            {% if reunion and reunion.condominio.pk == condo.pk %}selected{% endif %}>
+                                            {{ condo.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Tipo de Reunión -->
+                            <div class="col-md-6">
+                                <label for="tipo_reunion" class="form-label">
+                                    Tipo de Reunión <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="tipo_reunion" name="tipo_reunion" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    {% for value, label in tipos_reunion %}
+                                        <option value="{{ value }}"
+                                            {% if reunion and reunion.tipo_reunion == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Nombre de la Reunión -->
+                            <div class="col-md-8">
+                                <label for="nombre_reunion" class="form-label">
+                                    Nombre de la Reunión <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nombre_reunion"
+                                    name="nombre_reunion"
+                                    placeholder="Ej: Asamblea General"
+                                    value="{% if reunion %}{{ reunion.nombre_reunion }}{% endif %}"
+                                    required
+                                    maxlength="20"
+                                >
+                                <div class="form-text">
+                                    Máximo 20 caracteres
+                                </div>
+                            </div>
+
+                            <!-- Fecha de la Reunión -->
+                            <div class="col-md-4">
+                                <label for="fecha_reunion" class="form-label">
+                                    Fecha <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="fecha_reunion"
+                                    name="fecha_reunion"
+                                    value="{% if reunion %}{{ reunion.fecha_reunion|date:'Y-m-d' }}{% endif %}"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Lugar de la Reunión -->
+                            <div class="col-12">
+                                <label for="lugar_reunion" class="form-label">
+                                    Lugar de la Reunión
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="lugar_reunion"
+                                    name="lugar_reunion"
+                                    placeholder="Ej: Salón de eventos del condominio"
+                                    value="{% if reunion %}{{ reunion.lugar_reunion }}{% endif %}"
+                                    maxlength="60"
+                                >
+                            </div>
+
+                            <!-- Motivo de la Reunión -->
+                            <div class="col-12">
+                                <label for="motivo_reunion" class="form-label">
+                                    Motivo o Temática
+                                </label>
+                                <textarea
+                                    class="form-control"
+                                    id="motivo_reunion"
+                                    name="motivo_reunion"
+                                    rows="4"
+                                    placeholder="Describe los temas a tratar en la reunión..."
+                                >{% if reunion %}{{ reunion.motivo_reunion }}{% endif %}</textarea>
+                            </div>
+
+                            <!-- URL del Acta -->
+                            <div class="col-12">
+                                <label for="acta_reunion_url" class="form-label">
+                                    URL del Acta
+                                </label>
+                                <input
+                                    type="url"
+                                    class="form-control"
+                                    id="acta_reunion_url"
+                                    name="acta_reunion_url"
+                                    placeholder="https://ejemplo.com/acta.pdf"
+                                    value="{% if reunion %}{{ reunion.acta_reunion_url }}{% endif %}"
+                                >
+                                <div class="form-text">
+                                    URL donde se encuentra el acta de la reunión (Google Drive, Dropbox, etc.)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <a href="{% url 'reunion_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Reunión
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            {% if reunion %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>Información del Registro
+                    </h6>
+                    <div class="row text-muted small">
+                        <div class="col-md-6">
+                            <strong>Creado:</strong> {{ reunion.created_at|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Última actualización:</strong> {{ reunion.updated_at|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

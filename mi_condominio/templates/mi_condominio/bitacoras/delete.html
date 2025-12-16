@@ -1,0 +1,109 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Eliminar Registro de Bitácora - Mi Condominio{% endblock %}
+{% block page_title %}Eliminar Registro de Bitácora{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'bitacora_list' %}">Bitácora</a></li>
+            <li class="breadcrumb-item active">Eliminar Registro</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario de confirmación -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <h6 class="mb-3">¿Está seguro que desea eliminar el siguiente registro de bitácora?</h6>
+
+                    <!-- Información del registro -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>ID:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    #{{ bitacora.id }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Incidencia:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    #{{ bitacora.incidencia.id }} - {{ bitacora.incidencia.titulo }}
+                                    <br>
+                                    <small class="text-muted">{{ bitacora.incidencia.condominio.nombre }}</small>
+                                </div>
+                            </div>
+
+                            {% if bitacora.accion %}
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Acción:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    <span class="badge bg-primary">{{ bitacora.accion }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if bitacora.detalle %}
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <strong>Detalle:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ bitacora.detalle }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong>Fecha:</strong>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ bitacora.fecha_bitacora|date:"d/m/Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'bitacora_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Sí, Eliminar Registro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

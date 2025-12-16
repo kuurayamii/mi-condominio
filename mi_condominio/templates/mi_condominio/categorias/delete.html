@@ -1,0 +1,103 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Eliminar Categoría - Mi Condominio{% endblock %}
+{% block page_title %}Eliminar Categoría{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'categoria_list' %}">Categorías</a></li>
+            <li class="breadcrumb-item active">Eliminar Categoría</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario de confirmación -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <h6 class="mb-3">¿Está seguro que desea eliminar la siguiente categoría?</h6>
+
+                    <!-- Información de la categoría -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>ID:</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    #{{ categoria.id }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>Nombre:</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    <i class="bi bi-tag-fill text-primary me-2"></i>
+                                    {{ categoria.nombre_categoria_incidencia }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Incidencias asociadas:</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {% if incidencias_count > 0 %}
+                                        <span class="badge bg-warning text-dark">
+                                            {{ incidencias_count }} incidencia{{ incidencias_count|pluralize }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Sin incidencias</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advertencia si hay incidencias -->
+                    {% if incidencias_count > 0 %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-x-circle me-2"></i>
+                        <strong>¡Atención!</strong> Esta categoría tiene <strong>{{ incidencias_count }} incidencia{{ incidencias_count|pluralize }}</strong> asociada{{ incidencias_count|pluralize }}.
+                        Al eliminar esta categoría, no podrás eliminarla debido a la protección de datos (PROTECT).
+                        <br><br>
+                        <strong>Recomendación:</strong> Primero reasigna las incidencias a otra categoría antes de eliminar esta.
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'categoria_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger" {% if incidencias_count > 0 %}disabled{% endif %}>
+                                <i class="bi bi-trash me-2"></i>Sí, Eliminar Categoría
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

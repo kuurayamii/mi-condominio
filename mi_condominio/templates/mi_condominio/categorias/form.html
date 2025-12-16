@@ -1,0 +1,65 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Categoría - Mi Condominio{% endblock %}
+{% block page_title %}{{ action }} Categoría{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'categoria_list' %}">Categorías</a></li>
+            <li class="breadcrumb-item active">{{ action }} Categoría</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">{{ action }} Categoría de Incidencia</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="nombre_categoria_incidencia" class="form-label">
+                                Nombre de la Categoría <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="nombre_categoria_incidencia"
+                                   name="nombre_categoria_incidencia"
+                                   maxlength="30"
+                                   value="{{ categoria.nombre_categoria_incidencia|default:'' }}"
+                                   placeholder="Ej: Mantenimiento, Seguridad, Limpieza..."
+                                   required
+                                   autofocus>
+                            <small class="text-muted">Máximo 30 caracteres</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Nota:</strong> Las categorías sirven para clasificar y organizar las incidencias reportadas en los condominios.
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'categoria_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Categoría
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

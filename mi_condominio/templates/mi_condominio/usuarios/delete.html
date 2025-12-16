@@ -1,0 +1,122 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Eliminar Usuario - Mi Condominio{% endblock %}
+{% block page_title %}Eliminar Usuario{% endblock %}
+
+{% block content %}
+<div class="usuario-delete-content">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'usuario_list' %}">Usuarios</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Eliminar</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <p class="mb-4">
+                        ¿Estás seguro de que deseas eliminar el siguiente usuario?
+                    </p>
+
+                    <!-- Información del usuario a eliminar -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                <i class="bi bi-person me-2"></i>Información del Usuario
+                            </h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Nombre Completo:</dt>
+                                <dd class="col-sm-8">{{ usuario.nombres }} {{ usuario.apellido }}</dd>
+
+                                <dt class="col-sm-4">RUT:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-secondary">{{ usuario.rut }}</span>
+                                </dd>
+
+                                <dt class="col-sm-4">Correo:</dt>
+                                <dd class="col-sm-8">{{ usuario.correo }}</dd>
+
+                                <dt class="col-sm-4">Condominio:</dt>
+                                <dd class="col-sm-8">{{ usuario.condominio.nombre }}</dd>
+
+                                <dt class="col-sm-4">Tipo:</dt>
+                                <dd class="col-sm-8">
+                                    {% if usuario.tipo_usuario == "ADMIN" %}
+                                        <span class="badge bg-danger">{{ usuario.get_tipo_usuario_display }}</span>
+                                    {% elif usuario.tipo_usuario == "SUPERVISOR" %}
+                                        <span class="badge bg-warning text-dark">{{ usuario.get_tipo_usuario_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info">{{ usuario.get_tipo_usuario_display }}</span>
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-4">Estado:</dt>
+                                <dd class="col-sm-8">
+                                    {% if usuario.estado_cuenta == "ACTIVO" %}
+                                        <span class="badge bg-success">{{ usuario.get_estado_cuenta_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ usuario.get_estado_cuenta_display }}</span>
+                                    {% endif %}
+                                </dd>
+
+                                {% if usuario.user %}
+                                <dt class="col-sm-4">Usuario:</dt>
+                                <dd class="col-sm-8">@{{ usuario.user.username }}</dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Advertencias -->
+                    <div class="alert alert-danger mb-4" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-shield-exclamation me-2"></i>Consecuencias de eliminar
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Se eliminará el usuario del sistema permanentemente</li>
+                            {% if usuario.user %}
+                            <li>Se eliminará la cuenta de acceso asociada (@{{ usuario.user.username }})</li>
+                            {% endif %}
+                            <li>Se perderán todos los registros de incidencias reportadas por este usuario</li>
+                            <li>Los datos no podrán ser recuperados</li>
+                        </ul>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{% url 'usuario_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Sí, Eliminar Usuario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

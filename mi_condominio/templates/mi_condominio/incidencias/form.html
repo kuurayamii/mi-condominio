@@ -1,0 +1,221 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Incidencia - Mi Condominio{% endblock %}
+{% block page_title %}{{ action }} Incidencia{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'incidencia_list' %}">Incidencias</a></li>
+            <li class="breadcrumb-item active">{{ action }} Incidencia</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">{{ action }} Incidencia</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Información Básica -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Información Básica</h6>
+                            <div class="row">
+                                <!-- Condominio -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="condominio" class="form-label">Condominio <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="condominio" name="condominio" required>
+                                        <option value="">Seleccione un condominio</option>
+                                        {% for condo in condominios %}
+                                        <option value="{{ condo.id }}"
+                                                {% if incidencia and incidencia.condominio.id == condo.id %}selected{% endif %}>
+                                            {{ condo.nombre }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Categoría -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="tipo_incidencia" class="form-label">Categoría <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="tipo_incidencia" name="tipo_incidencia" required>
+                                        <option value="">Seleccione una categoría</option>
+                                        {% for categoria in categorias %}
+                                        <option value="{{ categoria.id }}"
+                                                {% if incidencia and incidencia.tipo_incidencia.id == categoria.id %}selected{% endif %}>
+                                            {{ categoria.nombre_categoria_incidencia }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Título -->
+                                <div class="col-12 mb-3">
+                                    <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                            class="form-control"
+                                            id="titulo"
+                                            name="titulo"
+                                            maxlength="160"
+                                            value="{{ incidencia.titulo|default:'' }}"
+                                            required>
+                                    <small class="text-muted">Máximo 160 caracteres</small>
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="col-12 mb-3">
+                                    <label for="descripcion" class="form-label">Descripción</label>
+                                    <textarea class="form-control"
+                                                id="descripcion"
+                                                name="descripcion"
+                                                rows="4"
+                                                placeholder="Descripción detallada de la incidencia">{{ incidencia.descripcion|default:'' }}
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estado y Prioridad -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Estado y Prioridad</h6>
+                            <div class="row">
+                                <!-- Estado -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="estado" name="estado" required>
+                                        {% for value, label in estados %}
+                                        <option value="{{ value }}"
+                                                {% if incidencia and incidencia.estado == value %}selected
+                                                {% elif not incidencia and value == 'PENDIENTE' %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Prioridad -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="prioridad" class="form-label">Prioridad <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="prioridad" name="prioridad" required>
+                                        {% for value, label in prioridades %}
+                                        <option value="{{ value }}"
+                                                {% if incidencia and incidencia.prioridad == value %}selected
+                                                {% elif not incidencia and value == 'MEDIA' %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Usuario que reporta -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="usuario_reporta" class="form-label">Usuario que reporta <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="usuario_reporta" name="usuario_reporta" required>
+                                        <option value="">Seleccione usuario</option>
+                                        {% for usuario in usuarios %}
+                                        <option value="{{ usuario.id }}"
+                                                {% if incidencia and incidencia.usuario_reporta.id == usuario.id %}selected{% endif %}>
+                                            {{ usuario.nombres }} {{ usuario.apellido }} - {{ usuario.condominio.nombre }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Fecha de cierre (solo en edición) -->
+                                {% if action == 'Editar' %}
+                                <div class="col-md-4 mb-3">
+                                    <label for="fecha_cierre" class="form-label">Fecha de Cierre</label>
+                                    <input type="date"
+                                            class="form-control"
+                                            id="fecha_cierre"
+                                            name="fecha_cierre"
+                                            value="{% if incidencia.fecha_cierre %}{{ incidencia.fecha_cierre|date:'Y-m-d' }}{% endif %}">
+                                    <small class="text-muted">Solo para incidencias cerradas o resueltas</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Ubicación (Opcional) -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Ubicación (Opcional)</h6>
+                            <div class="row">
+                                <!-- Dirección -->
+                                <div class="col-12 mb-3">
+                                    <label for="direccion_incidencia" class="form-label">Dirección</label>
+                                    <input type="text"
+                                            class="form-control"
+                                            id="direccion_incidencia"
+                                            name="direccion_incidencia"
+                                            maxlength="180"
+                                            value="{{ incidencia.direccion_condominio_incidencia|default:'' }}"
+                                            placeholder="Dirección asociada a la incidencia">
+                                </div>
+
+                                <!-- Botón para obtener ubicación -->
+                                <div class="col-12 mb-3">
+                                    <button type="button" class="btn btn-outline-primary" id="btnObtenerUbicacion">
+                                        <i class="bi bi-geo-alt-fill me-2"></i>Obtener Mi Ubicación
+                                    </button>
+                                    <small class="text-muted ms-2" id="ubicacionStatus"></small>
+                                </div>
+
+                                <!-- Latitud -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="ubicacion_latitud" class="form-label">Latitud</label>
+                                    <input type="text"
+                                            class="form-control"
+                                            id="ubicacion_latitud"
+                                            name="ubicacion_latitud"
+                                            maxlength="50"
+                                            value="{{ incidencia.ubicacion_latitud_reporte|default:'' }}"
+                                            placeholder="Ej: -33.4489"
+                                            readonly>
+                                    <small class="text-muted">Coordenada de latitud del reporte</small>
+                                </div>
+
+                                <!-- Longitud -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="ubicacion_longitud" class="form-label">Longitud</label>
+                                    <input type="text"
+                                            class="form-control"
+                                            id="ubicacion_longitud"
+                                            name="ubicacion_longitud"
+                                            maxlength="50"
+                                            value="{{ incidencia.ubicacion_longitud_reporte|default:'' }}"
+                                            placeholder="Ej: -70.6693"
+                                            readonly>
+                                    <small class="text-muted">Coordenada de longitud del reporte</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'incidencia_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Incidencia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<!-- Módulo de Geolocalización -->
+<script src="{% static 'mi_condominio/js/geolocation.js' %}"></script>
+{% endblock %}

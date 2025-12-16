@@ -54,11 +54,11 @@
                             <i class="bi bi-building"></i>
                             <span>Condominios</span>
                         </a>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'usuario_list' %}" class="nav-link {% if request.resolver_match.url_name == 'usuario_list' or request.resolver_match.url_name == 'usuario_create' or request.resolver_match.url_name == 'usuario_edit' or request.resolver_match.url_name == 'usuario_delete' %}active{% endif %}">
                             <i class="bi bi-people"></i>
                             <span>Usuarios</span>
                         </a>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'reunion_list' %}" class="nav-link {% if request.resolver_match.url_name == 'reunion_list' or request.resolver_match.url_name == 'reunion_create' or request.resolver_match.url_name == 'reunion_edit' or request.resolver_match.url_name == 'reunion_delete' %}active{% endif %}">
                             <i class="bi bi-calendar-event"></i>
                             <span>Reuniones</span>
                         </a>
@@ -67,11 +67,11 @@
                     <!-- Incidencias y Reportes -->
                     <div class="nav-section">
                         <div class="nav-section-title">Reportes</div>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'incidencia_list' %}" class="nav-link {% if request.resolver_match.url_name == 'incidencia_list' or request.resolver_match.url_name == 'incidencia_create' or request.resolver_match.url_name == 'incidencia_edit' or request.resolver_match.url_name == 'incidencia_delete' %}active{% endif %}">
                             <i class="bi bi-exclamation-triangle"></i>
                             <span>Incidencias</span>
                         </a>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'bitacora_list' %}" class="nav-link {% if request.resolver_match.url_name == 'bitacora_list' or request.resolver_match.url_name == 'bitacora_create' or request.resolver_match.url_name == 'bitacora_edit' or request.resolver_match.url_name == 'bitacora_delete' %}active{% endif %}">
                             <i class="bi bi-journal-text"></i>
                             <span>Bitácora</span>
                         </a>
@@ -84,7 +84,7 @@
                     <!-- Administración -->
                     <div class="nav-section">
                         <div class="nav-section-title">Administración</div>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'categoria_list' %}" class="nav-link {% if request.resolver_match.url_name == 'categoria_list' or request.resolver_match.url_name == 'categoria_create' or request.resolver_match.url_name == 'categoria_edit' or request.resolver_match.url_name == 'categoria_delete' %}active{% endif %}">
                             <i class="bi bi-tags"></i>
                             <span>Categorías</span>
                         </a>

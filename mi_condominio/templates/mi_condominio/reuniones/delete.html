@@ -1,0 +1,105 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Eliminar Reunión - Mi Condominio{% endblock %}
+{% block page_title %}Eliminar Reunión{% endblock %}
+
+{% block content %}
+<div class="reunion-delete-content">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'reunion_list' %}">Reuniones</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Eliminar</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <p class="mb-4">
+                        ¿Estás seguro de que deseas eliminar la siguiente reunión?
+                    </p>
+
+                    <!-- Información de la reunión a eliminar -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                <i class="bi bi-calendar-event me-2"></i>Información de la Reunión
+                            </h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Nombre:</dt>
+                                <dd class="col-sm-8">{{ reunion.nombre_reunion }}</dd>
+
+                                <dt class="col-sm-4">Tipo:</dt>
+                                <dd class="col-sm-8">
+                                    {% if reunion.tipo_reunion == "ORDINARIA" %}
+                                        <span class="badge bg-primary">{{ reunion.get_tipo_reunion_display }}</span>
+                                    {% elif reunion.tipo_reunion == "EXTRAORDINARIA" %}
+                                        <span class="badge bg-warning text-dark">{{ reunion.get_tipo_reunion_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info">{{ reunion.get_tipo_reunion_display }}</span>
+                                    {% endif %}
+                                </dd>
+
+                                <dt class="col-sm-4">Condominio:</dt>
+                                <dd class="col-sm-8">{{ reunion.condominio.nombre }}</dd>
+
+                                <dt class="col-sm-4">Fecha:</dt>
+                                <dd class="col-sm-8">{{ reunion.fecha_reunion|date:"d/m/Y" }}</dd>
+
+                                <dt class="col-sm-4">Lugar:</dt>
+                                <dd class="col-sm-8">{{ reunion.lugar_reunion|default:"No especificado" }}</dd>
+
+                                {% if reunion.motivo_reunion %}
+                                <dt class="col-sm-4">Motivo:</dt>
+                                <dd class="col-sm-8">{{ reunion.motivo_reunion }}</dd>
+                                {% endif %}
+
+                                {% if reunion.acta_reunion_url %}
+                                <dt class="col-sm-4">Acta:</dt>
+                                <dd class="col-sm-8">
+                                    <a href="{{ reunion.acta_reunion_url }}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-file-earmark-text me-1"></i>Ver acta
+                                    </a>
+                                </dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{% url 'reunion_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Sí, Eliminar Reunión
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Incidencias - Mi Condominio{% endblock %}
+{% block page_title %}Incidencias{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header con botón de crear -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Gestión de Incidencias</h4>
+            <p class="text-muted mb-0">Administra las incidencias reportadas en los condominios</p>
+        </div>
+        <a href="{% url 'incidencia_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Incidencia
+        </a>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <!-- Búsqueda -->
+                <div class="col-md-4">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Título, descripción, usuario..."
+                           value="{{ search_query }}">
+                </div>
+
+                <!-- Filtro por condominio -->
+                <div class="col-md-2">
+                    <label class="form-label">Condominio</label>
+                    <select name="condominio" class="form-select">
+                        <option value="">Todos</option>
+                        {% for condominio in condominios %}
+                        <option value="{{ condominio.id }}" {% if condominio_id == condominio.id|stringformat:"s" %}selected{% endif %}>
+                            {{ condominio.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filtro por estado -->
+                <div class="col-md-2">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos</option>
+                        {% for value, label in estados %}
+                        <option value="{{ value }}" {% if estado_filtro == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filtro por prioridad -->
+                <div class="col-md-2">
+                    <label class="form-label">Prioridad</label>
+                    <select name="prioridad" class="form-select">
+                        <option value="">Todas</option>
+                        {% for value, label in prioridades %}
+                        <option value="{{ value }}" {% if prioridad_filtro == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filtro por categoría -->
+                <div class="col-md-2">
+                    <label class="form-label">Categoría</label>
+                    <select name="categoria" class="form-select">
+                        <option value="">Todas</option>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}" {% if categoria_id == categoria.id|stringformat:"s" %}selected{% endif %}>
+                            {{ categoria.nombre_categoria_incidencia }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-2"></i>Buscar
+                    </button>
+                    <a href="{% url 'incidencia_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de incidencias -->
+    <div class="card">
+        <div class="card-body">
+            {% if incidencias %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Condominio</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                                <th>Prioridad</th>
+                                <th>Reportado por</th>
+                                <th>Fecha Reporte</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for incidencia in incidencias %}
+                            <tr>
+                                <td><strong>#{{ incidencia.id }}</strong></td>
+                                <td>
+                                    <strong>{{ incidencia.titulo }}</strong>
+                                    {% if incidencia.descripcion %}
+                                    <br><small class="text-muted">{{ incidencia.descripcion|truncatewords:10 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ incidencia.condominio.nombre }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ incidencia.tipo_incidencia.nombre_categoria_incidencia }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if incidencia.estado == 'PENDIENTE' %}
+                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                    {% elif incidencia.estado == 'EN_PROCESO' %}
+                                        <span class="badge bg-info text-dark">En Proceso</span>
+                                    {% elif incidencia.estado == 'RESUELTA' %}
+                                        <span class="badge bg-success">Resuelta</span>
+                                    {% elif incidencia.estado == 'CERRADA' %}
+                                        <span class="badge bg-dark">Cerrada</span>
+                                    {% elif incidencia.estado == 'CANCELADA' %}
+                                        <span class="badge bg-secondary">Cancelada</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if incidencia.prioridad == 'URGENTE' %}
+                                        <span class="badge bg-danger">Urgente</span>
+                                    {% elif incidencia.prioridad == 'ALTA' %}
+                                        <span class="badge bg-warning text-dark">Alta</span>
+                                    {% elif incidencia.prioridad == 'MEDIA' %}
+                                        <span class="badge bg-info text-dark">Media</span>
+                                    {% elif incidencia.prioridad == 'BAJA' %}
+                                        <span class="badge bg-secondary">Baja</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar-sm me-2">
+                                            <i class="bi bi-person-circle"></i>
+                                        </div>
+                                        <div>
+                                            <small>{{ incidencia.usuario_reporta.nombres }} {{ incidencia.usuario_reporta.apellido }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ incidencia.fecha_reporte|date:"d/m/Y" }}</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'incidencia_edit' incidencia.pk %}"
+                                           class="btn btn-outline-primary"
+                                           title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'incidencia_delete' incidencia.pk %}"
+                                           class="btn btn-outline-danger"
+                                           title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3 mb-0">No se encontraron incidencias</p>
+                    {% if search_query or condominio_id or estado_filtro or prioridad_filtro or categoria_id %}
+                        <small class="text-muted">Intenta ajustar los filtros de búsqueda</small>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <p class="text-muted mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Total de incidencias: <strong>{{ incidencias|length }}</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.user-avatar-sm {
+    font-size: 1.5rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

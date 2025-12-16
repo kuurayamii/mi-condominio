@@ -1,0 +1,194 @@
+{% extends "mi_condominio/dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Usuarios - Mi Condominio{% endblock %}
+{% block page_title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<div class="usuarios-content">
+    <!-- Header con botón de crear -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Listado de Usuarios</h4>
+            <p class="text-muted mb-0">Administra todos los usuarios del sistema</p>
+        </div>
+        <a href="{% url 'usuario_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{% url 'usuario_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="search"
+                                placeholder="Buscar por nombre, RUT o correo..."
+                                value="{{ search_query }}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="condominio">
+                            <option value="">Todos los condominios</option>
+                            {% for condo in condominios %}
+                                <option value="{{ condo.pk }}" {% if condominio_id == condo.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ condo.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="tipo_usuario">
+                            <option value="">Todos los tipos</option>
+                            {% for value, label in tipos_usuario %}
+                                <option value="{{ value }}" {% if tipo_usuario_filtro == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de usuarios -->
+    <div class="card">
+        <div class="card-body">
+            {% if usuarios %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>RUT</th>
+                                <th>Correo</th>
+                                <th>Condominio</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ usuario.nombres }} {{ usuario.apellido }}</strong>
+                                            {% if usuario.user %}
+                                                <br><small class="text-muted">@{{ usuario.user.username }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ usuario.rut }}</span>
+                                </td>
+                                <td>
+                                    <a href="mailto:{{ usuario.correo }}" class="text-decoration-none">
+                                        <i class="bi bi-envelope me-1"></i>{{ usuario.correo }}
+                                    </a>
+                                </td>
+                                <td>{{ usuario.condominio.nombre }}</td>
+                                <td>
+                                    {% if usuario.tipo_usuario == "ADMIN" %}
+                                        <span class="badge bg-danger">{{ usuario.get_tipo_usuario_display }}</span>
+                                    {% elif usuario.tipo_usuario == "SUPERVISOR" %}
+                                        <span class="badge bg-warning text-dark">{{ usuario.get_tipo_usuario_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info">{{ usuario.get_tipo_usuario_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if usuario.estado_cuenta == "ACTIVO" %}
+                                        <span class="badge bg-success">{{ usuario.get_estado_cuenta_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ usuario.get_estado_cuenta_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a
+                                            href="{% url 'usuario_edit' usuario.pk %}"
+                                            class="btn btn-sm btn-outline-primary"
+                                            title="Editar"
+                                        >
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a
+                                            href="{% url 'usuario_delete' usuario.pk %}"
+                                            class="btn btn-sm btn-outline-danger"
+                                            title="Eliminar"
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Información de resultados -->
+                <div class="mt-3">
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Mostrando {{ usuarios.count }} usuario{{ usuarios.count|pluralize }}
+                    </p>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-people" style="font-size: 4rem; color: #cbd5e1;"></i>
+                    <h5 class="mt-3 text-muted">No se encontraron usuarios</h5>
+                    {% if search_query or condominio_id or tipo_usuario_filtro %}
+                        <p class="text-muted">No hay resultados para los filtros aplicados</p>
+                        <a href="{% url 'usuario_list' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar filtros
+                        </a>
+                    {% else %}
+                        <p class="text-muted">Comienza creando tu primer usuario</p>
+                        <a href="{% url 'usuario_create' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Crear Usuario
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
