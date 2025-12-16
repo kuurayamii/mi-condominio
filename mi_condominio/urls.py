@@ -44,6 +44,18 @@ urlpatterns = [
     path("bitacoras/<int:pk>/editar/", views.bitacora_edit, name="bitacora_edit"),
     path("bitacoras/<int:pk>/eliminar/", views.bitacora_delete, name="bitacora_delete"),
 
+    # URLs para gestión de evidencias
+    path("evidencias/", views.evidencia_list, name="evidencia_list"),
+    path("evidencias/crear/", views.evidencia_create, name="evidencia_create"),
+    path("evidencias/<int:pk>/editar/", views.evidencia_edit, name="evidencia_edit"),
+    path("evidencias/<int:pk>/eliminar/", views.evidencia_delete, name="evidencia_delete"),
+
+    # URLs para gestión de amonestaciones
+    path("amonestaciones/", views.amonestacion_list, name="amonestacion_list"),
+    path("amonestaciones/crear/", views.amonestacion_create, name="amonestacion_create"),
+    path("amonestaciones/<int:pk>/editar/", views.amonestacion_edit, name="amonestacion_edit"),
+    path("amonestaciones/<int:pk>/eliminar/", views.amonestacion_delete, name="amonestacion_delete"),
+
     # TODO: Borrar esta ruta después cuando ya no sea necesaria
     # path("old/", views.index, name="index"),
 ]

@@ -75,7 +75,7 @@
                             <i class="bi bi-journal-text"></i>
                             <span>Bitácora</span>
                         </a>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'evidencia_list' %}" class="nav-link {% if request.resolver_match.url_name == 'evidencia_list' or request.resolver_match.url_name == 'evidencia_create' or request.resolver_match.url_name == 'evidencia_edit' or request.resolver_match.url_name == 'evidencia_delete' %}active{% endif %}">
                             <i class="bi bi-file-earmark-image"></i>
                             <span>Evidencias</span>
                         </a>
@@ -88,7 +88,7 @@
                             <i class="bi bi-tags"></i>
                             <span>Categorías</span>
                         </a>
-                        <a href="#" class="nav-link">
+                        <a href="{% url 'amonestacion_list' %}" class="nav-link {% if request.resolver_match.url_name == 'amonestacion_list' or request.resolver_match.url_name == 'amonestacion_create' or request.resolver_match.url_name == 'amonestacion_edit' or request.resolver_match.url_name == 'amonestacion_delete' %}active{% endif %}">
                             <i class="bi bi-shield-exclamation"></i>
                             <span>Amonestaciones</span>
                         </a>

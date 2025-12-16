@@ -1,0 +1,161 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+
+{% block title %}{% if is_edit %}Editar Amonestación{% else %}Registrar Amonestación{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{% if is_edit %}Editar Amonestación{% else %}Registrar Nueva Amonestación{% endif %}</h2>
+        <a href="{% url 'amonestacion_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Información Básica -->
+                        <h5 class="mb-3">Información Básica</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="condominio" class="form-label">Condominio <span class="text-danger">*</span></label>
+                                <select name="condominio" id="condominio" class="form-select" required>
+                                    <option value="">Seleccione un condominio</option>
+                                    {% for condominio in condominios %}
+                                        <option value="{{ condominio.id }}"
+                                                {% if is_edit and amonestacion.condominio.id == condominio.id %}selected{% endif %}>
+                                            {{ condominio.nombre_condominio }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="usuario" class="form-label">Usuario <span class="text-danger">*</span></label>
+                                <select name="usuario" id="usuario" class="form-select" required>
+                                    <option value="">Seleccione un usuario</option>
+                                    {% for usuario in usuarios %}
+                                        <option value="{{ usuario.id }}"
+                                                {% if is_edit and amonestacion.usuario.id == usuario.id %}selected{% endif %}>
+                                            {{ usuario.apellido_usuario }}, {{ usuario.nombre_usuario }} ({{ usuario.email_usuario }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo_amonestacion" class="form-label">Tipo de Amonestación <span class="text-danger">*</span></label>
+                                <select name="tipo_amonestacion" id="tipo_amonestacion" class="form-select" required>
+                                    <option value="">Seleccione el tipo</option>
+                                    {% for codigo, nombre in tipos_amonestacion %}
+                                        <option value="{{ codigo }}"
+                                                {% if is_edit and amonestacion.tipo_amonestacion == codigo %}selected{% endif %}>
+                                            {{ nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="fecha_amonestacion" class="form-label">Fecha <span class="text-danger">*</span></label>
+                                <input type="date"
+                                       name="fecha_amonestacion"
+                                       id="fecha_amonestacion"
+                                       class="form-control"
+                                       value="{% if is_edit %}{{ amonestacion.fecha_amonestacion|date:'Y-m-d' }}{% endif %}"
+                                       required>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Detalles de la Amonestación -->
+                        <h5 class="mb-3">Detalles de la Amonestación</h5>
+
+                        <div class="mb-3">
+                            <label for="motivo_amonestacion" class="form-label">Motivo <span class="text-danger">*</span></label>
+                            <select name="motivo_amonestacion" id="motivo_amonestacion" class="form-select" required>
+                                <option value="">Seleccione el motivo</option>
+                                {% for codigo, nombre in motivos %}
+                                    <option value="{{ codigo }}"
+                                            {% if is_edit and amonestacion.motivo_amonestacion == codigo %}selected{% endif %}>
+                                        {{ nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion_amonestacion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <textarea name="descripcion_amonestacion"
+                                      id="descripcion_amonestacion"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Describa detalladamente la situación que originó la amonestación..."
+                                      required>{% if is_edit %}{{ amonestacion.descripcion_amonestacion }}{% endif %}</textarea>
+                            <small class="form-text text-muted">
+                                Proporcione una descripción clara y detallada de la amonestación
+                            </small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'amonestacion_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>
+                                {% if is_edit %}Actualizar Amonestación{% else %}Registrar Amonestación{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>Información
+                    </h5>
+                    <p class="card-text">
+                        Las amonestaciones son medidas disciplinarias aplicadas a usuarios que incumplen las normas del condominio.
+                    </p>
+                    <hr>
+                    <h6>Tipos de Amonestación:</h6>
+                    <ul class="small">
+                        <li><span class="badge bg-info">Verbal</span> Llamado de atención oral</li>
+                        <li><span class="badge bg-warning">Escrita</span> Notificación formal por escrito</li>
+                        <li><span class="badge bg-danger">Multa</span> Sanción económica</li>
+                        <li><span class="badge bg-dark">Suspensión</span> Suspensión temporal de servicios</li>
+                    </ul>
+                    <hr>
+                    <h6>Motivos Comunes:</h6>
+                    <ul class="small">
+                        <li>Ruidos molestos</li>
+                        <li>Incumplimiento de normas</li>
+                        <li>Uso indebido de áreas comunes</li>
+                        <li>Falta de pago</li>
+                        <li>Problemas con mascotas</li>
+                        <li>Y más...</li>
+                    </ul>
+                    <hr>
+                    <p class="small text-muted mb-0">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Asegúrese de documentar claramente la situación para mantener un registro transparente.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

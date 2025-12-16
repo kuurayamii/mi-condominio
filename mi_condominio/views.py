@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import models
-from .models import Condominio, Reunion, Usuario, Incidencia, CategoriaIncidencia, Bitacora
+from django.db.models import Q
+from .models import Condominio, Reunion, Usuario, Incidencia, CategoriaIncidencia, Bitacora, EvidenciaIncidencia, Amonestacion
 from django.contrib.auth.models import User
 
 
@@ -1015,5 +1016,290 @@ def bitacora_delete(request, pk):
 
     return render(request, 'mi_condominio/bitacoras/delete.html', {
         'bitacora': bitacora,
+    })
+
+
+# ==================== VISTAS PARA EVIDENCIAS ====================
+
+@login_required
+def evidencia_list(request):
+    evidencias = EvidenciaIncidencia.objects.select_related('incidencia', 'incidencia__condominio').all().order_by('-id')
+
+    # Filtros
+    incidencia_id = request.GET.get('incidencia')
+    tipo_archivo = request.GET.get('tipo_archivo')
+    search = request.GET.get('search')
+
+    if incidencia_id:
+        evidencias = evidencias.filter(incidencia_id=incidencia_id)
+
+    if tipo_archivo:
+        evidencias = evidencias.filter(tipo_archivo_evidencia=tipo_archivo)
+
+    if search:
+        evidencias = evidencias.filter(
+            Q(incidencia__titulo_incidencia__icontains=search) |
+            Q(url_archivo_evidencia__icontains=search)
+        )
+
+    # Para los filtros
+    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
+    tipos_archivo = EvidenciaIncidencia.TIPOS_ARCHIVO
+
+    return render(request, 'mi_condominio/evidencias/list.html', {
+        'evidencias': evidencias,
+        'incidencias': incidencias,
+        'tipos_archivo': tipos_archivo,
+    })
+
+
+@login_required
+def evidencia_create(request):
+    if request.method == 'POST':
+        incidencia_id = request.POST.get('incidencia')
+        url_archivo = request.POST.get('url_archivo_evidencia')
+        tipo_archivo = request.POST.get('tipo_archivo_evidencia')
+
+        if not incidencia_id or not url_archivo or not tipo_archivo:
+            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        else:
+            try:
+                incidencia = Incidencia.objects.get(pk=incidencia_id)
+
+                evidencia = EvidenciaIncidencia.objects.create(
+                    incidencia=incidencia,
+                    url_archivo_evidencia=url_archivo,
+                    tipo_archivo_evidencia=tipo_archivo
+                )
+
+                messages.success(request, f'Evidencia agregada exitosamente a la incidencia "{incidencia.titulo_incidencia}".')
+                return redirect('evidencia_list')
+            except Incidencia.DoesNotExist:
+                messages.error(request, 'La incidencia seleccionada no existe.')
+            except Exception as e:
+                messages.error(request, f'Error al crear la evidencia: {str(e)}')
+
+    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
+    tipos_archivo = EvidenciaIncidencia.TIPOS_ARCHIVO
+
+    return render(request, 'mi_condominio/evidencias/form.html', {
+        'incidencias': incidencias,
+        'tipos_archivo': tipos_archivo,
+        'is_edit': False,
+    })
+
+
+@login_required
+def evidencia_edit(request, pk):
+    evidencia = get_object_or_404(EvidenciaIncidencia, pk=pk)
+
+    if request.method == 'POST':
+        incidencia_id = request.POST.get('incidencia')
+        url_archivo = request.POST.get('url_archivo_evidencia')
+        tipo_archivo = request.POST.get('tipo_archivo_evidencia')
+
+        if not incidencia_id or not url_archivo or not tipo_archivo:
+            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        else:
+            try:
+                incidencia = Incidencia.objects.get(pk=incidencia_id)
+
+                evidencia.incidencia = incidencia
+                evidencia.url_archivo_evidencia = url_archivo
+                evidencia.tipo_archivo_evidencia = tipo_archivo
+                evidencia.save()
+
+                messages.success(request, 'Evidencia actualizada exitosamente.')
+                return redirect('evidencia_list')
+            except Incidencia.DoesNotExist:
+                messages.error(request, 'La incidencia seleccionada no existe.')
+            except Exception as e:
+                messages.error(request, f'Error al actualizar la evidencia: {str(e)}')
+
+    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
+    tipos_archivo = EvidenciaIncidencia.TIPOS_ARCHIVO
+
+    return render(request, 'mi_condominio/evidencias/form.html', {
+        'evidencia': evidencia,
+        'incidencias': incidencias,
+        'tipos_archivo': tipos_archivo,
+        'is_edit': True,
+    })
+
+
+@login_required
+def evidencia_delete(request, pk):
+    evidencia = get_object_or_404(EvidenciaIncidencia, pk=pk)
+
+    if request.method == 'POST':
+        incidencia_titulo = evidencia.incidencia.titulo_incidencia
+        evidencia.delete()
+        messages.success(request, f'Evidencia de "{incidencia_titulo}" eliminada exitosamente.')
+        return redirect('evidencia_list')
+
+    return render(request, 'mi_condominio/evidencias/delete.html', {
+        'evidencia': evidencia,
+    })
+
+
+# ==================== VISTAS PARA AMONESTACIONES ====================
+
+@login_required
+def amonestacion_list(request):
+    amonestaciones = Amonestacion.objects.select_related('usuario', 'condominio').all().order_by('-fecha_amonestacion', '-id')
+
+    # Filtros
+    condominio_id = request.GET.get('condominio')
+    usuario_id = request.GET.get('usuario')
+    tipo_amonestacion = request.GET.get('tipo_amonestacion')
+    motivo = request.GET.get('motivo')
+    search = request.GET.get('search')
+
+    if condominio_id:
+        amonestaciones = amonestaciones.filter(condominio_id=condominio_id)
+
+    if usuario_id:
+        amonestaciones = amonestaciones.filter(usuario_id=usuario_id)
+
+    if tipo_amonestacion:
+        amonestaciones = amonestaciones.filter(tipo_amonestacion=tipo_amonestacion)
+
+    if motivo:
+        amonestaciones = amonestaciones.filter(motivo_amonestacion=motivo)
+
+    if search:
+        amonestaciones = amonestaciones.filter(
+            Q(descripcion_amonestacion__icontains=search) |
+            Q(usuario__nombre_usuario__icontains=search) |
+            Q(usuario__apellido_usuario__icontains=search)
+        )
+
+    # Para los filtros
+    condominios = Condominio.objects.all().order_by('nombre_condominio')
+    usuarios = Usuario.objects.all().order_by('apellido_usuario', 'nombre_usuario')
+    tipos_amonestacion = Amonestacion.TIPOS_AMONESTACION
+    motivos = Amonestacion.MOTIVOS_AMONESTACION
+
+    return render(request, 'mi_condominio/amonestaciones/list.html', {
+        'amonestaciones': amonestaciones,
+        'condominios': condominios,
+        'usuarios': usuarios,
+        'tipos_amonestacion': tipos_amonestacion,
+        'motivos': motivos,
+    })
+
+
+@login_required
+def amonestacion_create(request):
+    if request.method == 'POST':
+        condominio_id = request.POST.get('condominio')
+        usuario_id = request.POST.get('usuario')
+        tipo_amonestacion = request.POST.get('tipo_amonestacion')
+        motivo = request.POST.get('motivo_amonestacion')
+        descripcion = request.POST.get('descripcion_amonestacion')
+        fecha = request.POST.get('fecha_amonestacion')
+
+        if not all([condominio_id, usuario_id, tipo_amonestacion, motivo, descripcion, fecha]):
+            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        else:
+            try:
+                condominio = Condominio.objects.get(pk=condominio_id)
+                usuario = Usuario.objects.get(pk=usuario_id)
+
+                amonestacion = Amonestacion.objects.create(
+                    condominio=condominio,
+                    usuario=usuario,
+                    tipo_amonestacion=tipo_amonestacion,
+                    motivo_amonestacion=motivo,
+                    descripcion_amonestacion=descripcion,
+                    fecha_amonestacion=fecha
+                )
+
+                messages.success(request, f'Amonestación registrada exitosamente para {usuario.nombre_usuario} {usuario.apellido_usuario}.')
+                return redirect('amonestacion_list')
+            except Condominio.DoesNotExist:
+                messages.error(request, 'El condominio seleccionado no existe.')
+            except Usuario.DoesNotExist:
+                messages.error(request, 'El usuario seleccionado no existe.')
+            except Exception as e:
+                messages.error(request, f'Error al crear la amonestación: {str(e)}')
+
+    condominios = Condominio.objects.all().order_by('nombre_condominio')
+    usuarios = Usuario.objects.all().order_by('apellido_usuario', 'nombre_usuario')
+    tipos_amonestacion = Amonestacion.TIPOS_AMONESTACION
+    motivos = Amonestacion.MOTIVOS_AMONESTACION
+
+    return render(request, 'mi_condominio/amonestaciones/form.html', {
+        'condominios': condominios,
+        'usuarios': usuarios,
+        'tipos_amonestacion': tipos_amonestacion,
+        'motivos': motivos,
+        'is_edit': False,
+    })
+
+
+@login_required
+def amonestacion_edit(request, pk):
+    amonestacion = get_object_or_404(Amonestacion, pk=pk)
+
+    if request.method == 'POST':
+        condominio_id = request.POST.get('condominio')
+        usuario_id = request.POST.get('usuario')
+        tipo_amonestacion = request.POST.get('tipo_amonestacion')
+        motivo = request.POST.get('motivo_amonestacion')
+        descripcion = request.POST.get('descripcion_amonestacion')
+        fecha = request.POST.get('fecha_amonestacion')
+
+        if not all([condominio_id, usuario_id, tipo_amonestacion, motivo, descripcion, fecha]):
+            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        else:
+            try:
+                condominio = Condominio.objects.get(pk=condominio_id)
+                usuario = Usuario.objects.get(pk=usuario_id)
+
+                amonestacion.condominio = condominio
+                amonestacion.usuario = usuario
+                amonestacion.tipo_amonestacion = tipo_amonestacion
+                amonestacion.motivo_amonestacion = motivo
+                amonestacion.descripcion_amonestacion = descripcion
+                amonestacion.fecha_amonestacion = fecha
+                amonestacion.save()
+
+                messages.success(request, 'Amonestación actualizada exitosamente.')
+                return redirect('amonestacion_list')
+            except Condominio.DoesNotExist:
+                messages.error(request, 'El condominio seleccionado no existe.')
+            except Usuario.DoesNotExist:
+                messages.error(request, 'El usuario seleccionado no existe.')
+            except Exception as e:
+                messages.error(request, f'Error al actualizar la amonestación: {str(e)}')
+
+    condominios = Condominio.objects.all().order_by('nombre_condominio')
+    usuarios = Usuario.objects.all().order_by('apellido_usuario', 'nombre_usuario')
+    tipos_amonestacion = Amonestacion.TIPOS_AMONESTACION
+    motivos = Amonestacion.MOTIVOS_AMONESTACION
+
+    return render(request, 'mi_condominio/amonestaciones/form.html', {
+        'amonestacion': amonestacion,
+        'condominios': condominios,
+        'usuarios': usuarios,
+        'tipos_amonestacion': tipos_amonestacion,
+        'motivos': motivos,
+        'is_edit': True,
+    })
+
+
+@login_required
+def amonestacion_delete(request, pk):
+    amonestacion = get_object_or_404(Amonestacion, pk=pk)
+
+    if request.method == 'POST':
+        usuario_nombre = f"{amonestacion.usuario.nombre_usuario} {amonestacion.usuario.apellido_usuario}"
+        amonestacion.delete()
+        messages.success(request, f'Amonestación de {usuario_nombre} eliminada exitosamente.')
+        return redirect('amonestacion_list')
+
+    return render(request, 'mi_condominio/amonestaciones/delete.html', {
+        'amonestacion': amonestacion,
     })
 

@@ -1,0 +1,134 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+
+{% block title %}Evidencias{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestión de Evidencias</h2>
+        <a href="{% url 'evidencia_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Agregar Evidencia
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="incidencia" class="form-label">Incidencia</label>
+                    <select name="incidencia" id="incidencia" class="form-select">
+                        <option value="">Todas las incidencias</option>
+                        {% for incidencia in incidencias %}
+                            <option value="{{ incidencia.id }}" {% if request.GET.incidencia == incidencia.id|stringformat:"s" %}selected{% endif %}>
+                                {{ incidencia.titulo_incidencia }} ({{ incidencia.condominio.nombre_condominio }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="tipo_archivo" class="form-label">Tipo de Archivo</label>
+                    <select name="tipo_archivo" id="tipo_archivo" class="form-select">
+                        <option value="">Todos los tipos</option>
+                        {% for codigo, nombre in tipos_archivo %}
+                            <option value="{{ codigo }}" {% if request.GET.tipo_archivo == codigo %}selected{% endif %}>
+                                {{ nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Buscar</label>
+                    <input type="text" name="search" id="search" class="form-control"
+                           placeholder="Buscar por título o URL..." value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 me-2">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de evidencias -->
+    <div class="card">
+        <div class="card-body">
+            {% if evidencias %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Incidencia</th>
+                                <th>Condominio</th>
+                                <th>Tipo de Archivo</th>
+                                <th>URL del Archivo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for evidencia in evidencias %}
+                                <tr>
+                                    <td>{{ evidencia.id }}</td>
+                                    <td>
+                                        <strong>{{ evidencia.incidencia.titulo_incidencia }}</strong><br>
+                                        <small class="text-muted">
+                                            {% if evidencia.incidencia.estado == 'ABIERTA' %}
+                                                <span class="badge bg-success">Abierta</span>
+                                            {% elif evidencia.incidencia.estado == 'EN_PROCESO' %}
+                                                <span class="badge bg-warning">En Proceso</span>
+                                            {% elif evidencia.incidencia.estado == 'CERRADA' %}
+                                                <span class="badge bg-secondary">Cerrada</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ evidencia.incidencia.get_estado_display }}</span>
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>{{ evidencia.incidencia.condominio.nombre_condominio }}</td>
+                                    <td>
+                                        {% if evidencia.tipo_archivo_evidencia == 'IMAGEN' %}
+                                            <i class="bi bi-image text-primary"></i> {{ evidencia.get_tipo_archivo_evidencia_display }}
+                                        {% elif evidencia.tipo_archivo_evidencia == 'VIDEO' %}
+                                            <i class="bi bi-camera-video text-danger"></i> {{ evidencia.get_tipo_archivo_evidencia_display }}
+                                        {% elif evidencia.tipo_archivo_evidencia == 'DOCUMENTO' %}
+                                            <i class="bi bi-file-earmark-text text-info"></i> {{ evidencia.get_tipo_archivo_evidencia_display }}
+                                        {% elif evidencia.tipo_archivo_evidencia == 'AUDIO' %}
+                                            <i class="bi bi-mic text-warning"></i> {{ evidencia.get_tipo_archivo_evidencia_display }}
+                                        {% else %}
+                                            <i class="bi bi-file-earmark text-secondary"></i> {{ evidencia.get_tipo_archivo_evidencia_display }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ evidencia.url_archivo_evidencia }}" target="_blank" class="text-decoration-none">
+                                            <i class="bi bi-link-45deg"></i> Ver archivo
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'evidencia_edit' evidencia.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'evidencia_delete' evidencia.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <p class="text-muted">Total de evidencias: {{ evidencias|length }}</p>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No hay evidencias registradas en el sistema.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

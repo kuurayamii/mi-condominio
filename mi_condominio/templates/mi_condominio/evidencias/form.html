@@ -1,0 +1,111 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+
+{% block title %}{% if is_edit %}Editar Evidencia{% else %}Agregar Evidencia{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{% if is_edit %}Editar Evidencia{% else %}Agregar Nueva Evidencia{% endif %}</h2>
+        <a href="{% url 'evidencia_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Volver a la lista
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Incidencia -->
+                        <div class="mb-3">
+                            <label for="incidencia" class="form-label">Incidencia <span class="text-danger">*</span></label>
+                            <select name="incidencia" id="incidencia" class="form-select" required>
+                                <option value="">Seleccione una incidencia</option>
+                                {% for incidencia in incidencias %}
+                                    <option value="{{ incidencia.id }}"
+                                            {% if is_edit and evidencia.incidencia.id == incidencia.id %}selected{% endif %}>
+                                        {{ incidencia.titulo_incidencia }} - {{ incidencia.condominio.nombre_condominio }}
+                                        ({{ incidencia.get_estado_display }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Seleccione la incidencia a la que pertenece esta evidencia</small>
+                        </div>
+
+                        <!-- URL del Archivo -->
+                        <div class="mb-3">
+                            <label for="url_archivo_evidencia" class="form-label">URL del Archivo <span class="text-danger">*</span></label>
+                            <input type="url"
+                                   name="url_archivo_evidencia"
+                                   id="url_archivo_evidencia"
+                                   class="form-control"
+                                   value="{% if is_edit %}{{ evidencia.url_archivo_evidencia }}{% endif %}"
+                                   placeholder="https://ejemplo.com/archivo.jpg"
+                                   required>
+                            <small class="form-text text-muted">
+                                URL completa del archivo de evidencia (imagen, video, documento, etc.)
+                            </small>
+                        </div>
+
+                        <!-- Tipo de Archivo -->
+                        <div class="mb-3">
+                            <label for="tipo_archivo_evidencia" class="form-label">Tipo de Archivo <span class="text-danger">*</span></label>
+                            <select name="tipo_archivo_evidencia" id="tipo_archivo_evidencia" class="form-select" required>
+                                <option value="">Seleccione el tipo de archivo</option>
+                                {% for codigo, nombre in tipos_archivo %}
+                                    <option value="{{ codigo }}"
+                                            {% if is_edit and evidencia.tipo_archivo_evidencia == codigo %}selected{% endif %}>
+                                        {{ nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Tipo de archivo que está adjuntando como evidencia</small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'evidencia_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>
+                                {% if is_edit %}Actualizar Evidencia{% else %}Agregar Evidencia{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>Información
+                    </h5>
+                    <p class="card-text">
+                        Las evidencias son archivos que respaldan o documentan una incidencia reportada.
+                    </p>
+                    <hr>
+                    <h6>Tipos de Archivo Soportados:</h6>
+                    <ul class="small">
+                        <li><i class="bi bi-image text-primary"></i> <strong>Imagen:</strong> JPG, PNG, GIF, etc.</li>
+                        <li><i class="bi bi-camera-video text-danger"></i> <strong>Video:</strong> MP4, AVI, MOV, etc.</li>
+                        <li><i class="bi bi-file-earmark-text text-info"></i> <strong>Documento:</strong> PDF, DOC, TXT, etc.</li>
+                        <li><i class="bi bi-mic text-warning"></i> <strong>Audio:</strong> MP3, WAV, AAC, etc.</li>
+                        <li><i class="bi bi-file-earmark text-secondary"></i> <strong>Otro:</strong> Cualquier otro formato</li>
+                    </ul>
+                    <hr>
+                    <p class="small text-muted mb-0">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Asegúrese de que la URL del archivo sea accesible y esté correctamente formateada.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

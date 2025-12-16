@@ -1,0 +1,75 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+
+{% block title %}Eliminar Evidencia{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <h5 class="mb-3">¿Está seguro que desea eliminar esta evidencia?</h5>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <strong>Incidencia:</strong><br>
+                                    {{ evidencia.incidencia.titulo_incidencia }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong>Condominio:</strong><br>
+                                    {{ evidencia.incidencia.condominio.nombre_condominio }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong>Tipo de Archivo:</strong><br>
+                                    {% if evidencia.tipo_archivo_evidencia == 'IMAGEN' %}
+                                        <i class="bi bi-image text-primary"></i>
+                                    {% elif evidencia.tipo_archivo_evidencia == 'VIDEO' %}
+                                        <i class="bi bi-camera-video text-danger"></i>
+                                    {% elif evidencia.tipo_archivo_evidencia == 'DOCUMENTO' %}
+                                        <i class="bi bi-file-earmark-text text-info"></i>
+                                    {% elif evidencia.tipo_archivo_evidencia == 'AUDIO' %}
+                                        <i class="bi bi-mic text-warning"></i>
+                                    {% else %}
+                                        <i class="bi bi-file-earmark text-secondary"></i>
+                                    {% endif %}
+                                    {{ evidencia.get_tipo_archivo_evidencia_display }}
+                                </div>
+                                <div class="col-md-12">
+                                    <strong>URL del Archivo:</strong><br>
+                                    <a href="{{ evidencia.url_archivo_evidencia }}" target="_blank" class="text-decoration-none">
+                                        {{ evidencia.url_archivo_evidencia }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'evidencia_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Eliminar Evidencia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
