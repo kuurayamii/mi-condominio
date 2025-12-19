@@ -15,29 +15,18 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label for="condominio" class="form-label">Condominio</label>
-                    <select name="condominio" id="condominio" class="form-select">
-                        <option value="">Todos los condominios</option>
-                        {% for condominio in condominios %}
-                            <option value="{{ condominio.id }}" {% if request.GET.condominio == condominio.id|stringformat:"s" %}selected{% endif %}>
-                                {{ condominio.nombre_condominio }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="usuario" class="form-label">Usuario</label>
-                    <select name="usuario" id="usuario" class="form-select">
+                <div class="col-md-4">
+                    <label for="usuario_reporta" class="form-label">Usuario</label>
+                    <select name="usuario_reporta" id="usuario_reporta" class="form-select">
                         <option value="">Todos los usuarios</option>
                         {% for usuario in usuarios %}
-                            <option value="{{ usuario.id }}" {% if request.GET.usuario == usuario.id|stringformat:"s" %}selected{% endif %}>
-                                {{ usuario.apellido_usuario }}, {{ usuario.nombre_usuario }}
+                            <option value="{{ usuario.id }}" {% if request.GET.usuario_reporta == usuario.id|stringformat:"s" %}selected{% endif %}>
+                                {{ usuario.apellido }}, {{ usuario.nombres }}
                             </option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label for="tipo_amonestacion" class="form-label">Tipo</label>
                     <select name="tipo_amonestacion" id="tipo_amonestacion" class="form-select">
                         <option value="">Todos los tipos</option>
@@ -48,7 +37,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label for="motivo" class="form-label">Motivo</label>
                     <select name="motivo" id="motivo" class="form-select">
                         <option value="">Todos los motivos</option>
@@ -92,11 +81,12 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Fecha</th>
-                                <th>Usuario</th>
-                                <th>Condominio</th>
+                                <th>Amonestado</th>
+                                <th>Depto.</th>
                                 <th>Tipo</th>
                                 <th>Motivo</th>
-                                <th>Descripción</th>
+                                <th>Detalle</th>
+                                <th>Reportado por</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -106,10 +96,10 @@
                                     <td>{{ amonestacion.id }}</td>
                                     <td>{{ amonestacion.fecha_amonestacion|date:"d/m/Y" }}</td>
                                     <td>
-                                        <strong>{{ amonestacion.usuario.nombre_usuario }} {{ amonestacion.usuario.apellido_usuario }}</strong><br>
-                                        <small class="text-muted">{{ amonestacion.usuario.email_usuario }}</small>
+                                        <strong>{{ amonestacion.nombre_amonestado }} {{ amonestacion.apellidos_amonestado }}</strong><br>
+                                        <small class="text-muted">{{ amonestacion.rut_amonestado }}</small>
                                     </td>
-                                    <td>{{ amonestacion.condominio.nombre_condominio }}</td>
+                                    <td>{{ amonestacion.numero_departamento|default:"-" }}</td>
                                     <td>
                                         {% if amonestacion.tipo_amonestacion == 'VERBAL' %}
                                             <span class="badge bg-info">{{ amonestacion.get_tipo_amonestacion_display }}</span>
@@ -122,10 +112,13 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <small>{{ amonestacion.get_motivo_amonestacion_display }}</small>
+                                        <small>{{ amonestacion.get_motivo_display }}</small>
                                     </td>
                                     <td>
-                                        <small>{{ amonestacion.descripcion_amonestacion|truncatewords:10 }}</small>
+                                        <small>{{ amonestacion.motivo_detalle|truncatewords:10|default:"-" }}</small>
+                                    </td>
+                                    <td>
+                                        <small>{{ amonestacion.usuario_reporta.apellido }}, {{ amonestacion.usuario_reporta.nombres }}</small>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

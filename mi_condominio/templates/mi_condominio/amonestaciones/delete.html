@@ -24,13 +24,13 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <strong>Usuario:</strong><br>
-                                    {{ amonestacion.usuario.nombre_usuario }} {{ amonestacion.usuario.apellido_usuario }}<br>
-                                    <small class="text-muted">{{ amonestacion.usuario.email_usuario }}</small>
+                                    <strong>Amonestado:</strong><br>
+                                    {{ amonestacion.nombre_amonestado }} {{ amonestacion.apellidos_amonestado }}<br>
+                                    <small class="text-muted">RUT: {{ amonestacion.rut_amonestado }}</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <strong>Condominio:</strong><br>
-                                    {{ amonestacion.condominio.nombre_condominio }}
+                                    <strong>Departamento:</strong><br>
+                                    {{ amonestacion.numero_departamento|default:"No especificado" }}
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <strong>Tipo:</strong><br>
@@ -50,11 +50,15 @@
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <strong>Motivo:</strong><br>
-                                    {{ amonestacion.get_motivo_amonestacion_display }}
+                                    {{ amonestacion.get_motivo_display }}
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <strong>Detalle del Motivo:</strong><br>
+                                    {{ amonestacion.motivo_detalle|default:"Sin detalle" }}
                                 </div>
                                 <div class="col-md-12">
-                                    <strong>Descripción:</strong><br>
-                                    {{ amonestacion.descripcion_amonestacion }}
+                                    <strong>Reportado por:</strong><br>
+                                    {{ amonestacion.usuario_reporta.apellido }}, {{ amonestacion.usuario_reporta.nombres }}
                                 </div>
                             </div>
                         </div>

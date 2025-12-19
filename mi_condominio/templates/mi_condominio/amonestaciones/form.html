@@ -18,36 +18,58 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- Información Básica -->
-                        <h5 class="mb-3">Información Básica</h5>
+                        <!-- Información del Amonestado -->
+                        <h5 class="mb-3">Información del Amonestado</h5>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="condominio" class="form-label">Condominio <span class="text-danger">*</span></label>
-                                <select name="condominio" id="condominio" class="form-select" required>
-                                    <option value="">Seleccione un condominio</option>
-                                    {% for condominio in condominios %}
-                                        <option value="{{ condominio.id }}"
-                                                {% if is_edit and amonestacion.condominio.id == condominio.id %}selected{% endif %}>
-                                            {{ condominio.nombre_condominio }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                <label for="nombre_amonestado" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       name="nombre_amonestado"
+                                       id="nombre_amonestado"
+                                       class="form-control"
+                                       value="{% if is_edit %}{{ amonestacion.nombre_amonestado }}{% endif %}"
+                                       required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="usuario" class="form-label">Usuario <span class="text-danger">*</span></label>
-                                <select name="usuario" id="usuario" class="form-select" required>
-                                    <option value="">Seleccione un usuario</option>
-                                    {% for usuario in usuarios %}
-                                        <option value="{{ usuario.id }}"
-                                                {% if is_edit and amonestacion.usuario.id == usuario.id %}selected{% endif %}>
-                                            {{ usuario.apellido_usuario }}, {{ usuario.nombre_usuario }} ({{ usuario.email_usuario }})
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                <label for="apellidos_amonestado" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       name="apellidos_amonestado"
+                                       id="apellidos_amonestado"
+                                       class="form-control"
+                                       value="{% if is_edit %}{{ amonestacion.apellidos_amonestado }}{% endif %}"
+                                       required>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="rut_amonestado" class="form-label">RUT <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       name="rut_amonestado"
+                                       id="rut_amonestado"
+                                       class="form-control"
+                                       placeholder="12.345.678-9"
+                                       value="{% if is_edit %}{{ amonestacion.rut_amonestado }}{% endif %}"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="numero_departamento" class="form-label">Número de Departamento</label>
+                                <input type="text"
+                                       name="numero_departamento"
+                                       id="numero_departamento"
+                                       class="form-control"
+                                       placeholder="101, 202, etc."
+                                       value="{% if is_edit %}{{ amonestacion.numero_departamento }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Detalles de la Amonestación -->
+                        <h5 class="mb-3">Detalles de la Amonestación</h5>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -74,18 +96,13 @@
                             </div>
                         </div>
 
-                        <hr class="my-4">
-
-                        <!-- Detalles de la Amonestación -->
-                        <h5 class="mb-3">Detalles de la Amonestación</h5>
-
                         <div class="mb-3">
                             <label for="motivo_amonestacion" class="form-label">Motivo <span class="text-danger">*</span></label>
                             <select name="motivo_amonestacion" id="motivo_amonestacion" class="form-select" required>
                                 <option value="">Seleccione el motivo</option>
                                 {% for codigo, nombre in motivos %}
                                     <option value="{{ codigo }}"
-                                            {% if is_edit and amonestacion.motivo_amonestacion == codigo %}selected{% endif %}>
+                                            {% if is_edit and amonestacion.motivo == codigo %}selected{% endif %}>
                                         {{ nombre }}
                                     </option>
                                 {% endfor %}
@@ -93,16 +110,40 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="descripcion_amonestacion" class="form-label">Descripción <span class="text-danger">*</span></label>
-                            <textarea name="descripcion_amonestacion"
-                                      id="descripcion_amonestacion"
+                            <label for="motivo_detalle" class="form-label">Detalle del Motivo</label>
+                            <textarea name="motivo_detalle"
+                                      id="motivo_detalle"
                                       class="form-control"
-                                      rows="5"
-                                      placeholder="Describa detalladamente la situación que originó la amonestación..."
-                                      required>{% if is_edit %}{{ amonestacion.descripcion_amonestacion }}{% endif %}</textarea>
+                                      rows="3"
+                                      placeholder="Describa detalladamente la situación que originó la amonestación...">{% if is_edit %}{{ amonestacion.motivo_detalle }}{% endif %}</textarea>
                             <small class="form-text text-muted">
-                                Proporcione una descripción clara y detallada de la amonestación
+                                Proporcione una descripción clara y detallada de la amonestación. Especialmente importante si seleccionó "Otro motivo".
                             </small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="usuario_reporta" class="form-label">Usuario que Reporta <span class="text-danger">*</span></label>
+                                <select name="usuario_reporta" id="usuario_reporta" class="form-select" required>
+                                    <option value="">Seleccione un usuario</option>
+                                    {% for usuario in usuarios %}
+                                        <option value="{{ usuario.id }}"
+                                                {% if is_edit and amonestacion.usuario_reporta.id == usuario.id %}selected{% endif %}>
+                                            {{ usuario.apellido }}, {{ usuario.nombres }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3" id="fecha_limite_pago_container" style="display: none;">
+                                <label for="fecha_limite_pago" class="form-label">Fecha Límite de Pago</label>
+                                <input type="date"
+                                       name="fecha_limite_pago"
+                                       id="fecha_limite_pago"
+                                       class="form-control"
+                                       value="{% if is_edit %}{{ amonestacion.fecha_limite_pago|date:'Y-m-d' }}{% endif %}">
+                                <small class="form-text text-muted">Solo para multas</small>
+                            </div>
                         </div>
 
                         <hr class="my-4">
@@ -158,4 +199,28 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoAmonestacion = document.getElementById('tipo_amonestacion');
+    const fechaLimitePagoContainer = document.getElementById('fecha_limite_pago_container');
+    const fechaLimitePagoInput = document.getElementById('fecha_limite_pago');
+
+    function toggleFechaLimitePago() {
+        if (tipoAmonestacion.value === 'MULTA') {
+            fechaLimitePagoContainer.style.display = 'block';
+            fechaLimitePagoInput.required = true;
+        } else {
+            fechaLimitePagoContainer.style.display = 'none';
+            fechaLimitePagoInput.required = false;
+            fechaLimitePagoInput.value = '';
+        }
+    }
+
+    tipoAmonestacion.addEventListener('change', toggleFechaLimitePago);
+
+    // Check on page load in case of edit mode
+    toggleFechaLimitePago();
+});
+</script>
 {% endblock %}
