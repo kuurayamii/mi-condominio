@@ -1146,43 +1146,38 @@ def evidencia_delete(request, pk):
 
 @login_required
 def amonestacion_list(request):
-    amonestaciones = Amonestacion.objects.select_related('usuario', 'condominio').all().order_by('-fecha_amonestacion', '-id')
+    amonestaciones = Amonestacion.objects.select_related('usuario_reporta').all().order_by('-fecha_amonestacion', '-id')
 
     # Filtros
-    condominio_id = request.GET.get('condominio')
-    usuario_id = request.GET.get('usuario')
+    usuario_reporta_id = request.GET.get('usuario_reporta')
     tipo_amonestacion = request.GET.get('tipo_amonestacion')
     motivo = request.GET.get('motivo')
     search = request.GET.get('search')
 
-    if condominio_id:
-        amonestaciones = amonestaciones.filter(condominio_id=condominio_id)
-
-    if usuario_id:
-        amonestaciones = amonestaciones.filter(usuario_id=usuario_id)
+    if usuario_reporta_id:
+        amonestaciones = amonestaciones.filter(usuario_reporta_id=usuario_reporta_id)
 
     if tipo_amonestacion:
         amonestaciones = amonestaciones.filter(tipo_amonestacion=tipo_amonestacion)
 
     if motivo:
-        amonestaciones = amonestaciones.filter(motivo_amonestacion=motivo)
+        amonestaciones = amonestaciones.filter(motivo=motivo)
 
     if search:
         amonestaciones = amonestaciones.filter(
-            Q(descripcion_amonestacion__icontains=search) |
-            Q(usuario__nombre_usuario__icontains=search) |
-            Q(usuario__apellido_usuario__icontains=search)
+            Q(motivo_detalle__icontains=search) |
+            Q(nombre_amonestado__icontains=search) |
+            Q(apellidos_amonestado__icontains=search) |
+            Q(rut_amonestado__icontains=search)
         )
 
     # Para los filtros
-    condominios = Condominio.objects.all().order_by('nombre_condominio')
-    usuarios = Usuario.objects.all().order_by('apellido_usuario', 'nombre_usuario')
-    tipos_amonestacion = Amonestacion.TIPOS_AMONESTACION
-    motivos = Amonestacion.MOTIVOS_AMONESTACION
+    usuarios = Usuario.objects.all().order_by('apellido', 'nombres')
+    tipos_amonestacion = Amonestacion.TipoAmonestacion.choices
+    motivos = Amonestacion.MotivoAmonestacion.choices
 
     return render(request, 'mi_condominio/amonestaciones/list.html', {
         'amonestaciones': amonestaciones,
-        'condominios': condominios,
         'usuarios': usuarios,
         'tipos_amonestacion': tipos_amonestacion,
         'motivos': motivos,
@@ -1192,45 +1187,48 @@ def amonestacion_list(request):
 @login_required
 def amonestacion_create(request):
     if request.method == 'POST':
-        condominio_id = request.POST.get('condominio')
-        usuario_id = request.POST.get('usuario')
+        usuario_reporta_id = request.POST.get('usuario_reporta')
         tipo_amonestacion = request.POST.get('tipo_amonestacion')
         motivo = request.POST.get('motivo_amonestacion')
-        descripcion = request.POST.get('descripcion_amonestacion')
+        motivo_detalle = request.POST.get('motivo_detalle')
         fecha = request.POST.get('fecha_amonestacion')
+        nombre_amonestado = request.POST.get('nombre_amonestado')
+        apellidos_amonestado = request.POST.get('apellidos_amonestado')
+        rut_amonestado = request.POST.get('rut_amonestado')
+        numero_departamento = request.POST.get('numero_departamento')
+        fecha_limite_pago = request.POST.get('fecha_limite_pago')
 
-        if not all([condominio_id, usuario_id, tipo_amonestacion, motivo, descripcion, fecha]):
+        if not all([usuario_reporta_id, tipo_amonestacion, motivo, fecha, nombre_amonestado, apellidos_amonestado, rut_amonestado]):
             messages.error(request, 'Por favor complete todos los campos requeridos.')
         else:
             try:
-                condominio = Condominio.objects.get(pk=condominio_id)
-                usuario = Usuario.objects.get(pk=usuario_id)
+                usuario_reporta = Usuario.objects.get(pk=usuario_reporta_id)
 
                 amonestacion = Amonestacion.objects.create(
-                    condominio=condominio,
-                    usuario=usuario,
+                    usuario_reporta=usuario_reporta,
                     tipo_amonestacion=tipo_amonestacion,
-                    motivo_amonestacion=motivo,
-                    descripcion_amonestacion=descripcion,
-                    fecha_amonestacion=fecha
+                    motivo=motivo,
+                    motivo_detalle=motivo_detalle,
+                    fecha_amonestacion=fecha,
+                    nombre_amonestado=nombre_amonestado,
+                    apellidos_amonestado=apellidos_amonestado,
+                    rut_amonestado=rut_amonestado,
+                    numero_departamento=numero_departamento,
+                    fecha_limite_pago=fecha_limite_pago if fecha_limite_pago else None
                 )
 
-                messages.success(request, f'Amonestación registrada exitosamente para {usuario.nombre_usuario} {usuario.apellido_usuario}.')
+                messages.success(request, f'Amonestación registrada exitosamente para {nombre_amonestado} {apellidos_amonestado}.')
                 return redirect('amonestacion_list')
-            except Condominio.DoesNotExist:
-                messages.error(request, 'El condominio seleccionado no existe.')
             except Usuario.DoesNotExist:
-                messages.error(request, 'El usuario seleccionado no existe.')
+                messages.error(request, 'El usuario que reporta no existe.')
             except Exception as e:
                 messages.error(request, f'Error al crear la amonestación: {str(e)}')
 
-    condominios = Condominio.objects.all().order_by('nombre_condominio')
-    usuarios = Usuario.objects.all().order_by('apellido_usuario', 'nombre_usuario')
-    tipos_amonestacion = Amonestacion.TIPOS_AMONESTACION
-    motivos = Amonestacion.MOTIVOS_AMONESTACION
+    usuarios = Usuario.objects.all().order_by('apellido', 'nombres')
+    tipos_amonestacion = Amonestacion.TipoAmonestacion.choices
+    motivos = Amonestacion.MotivoAmonestacion.choices
 
     return render(request, 'mi_condominio/amonestaciones/form.html', {
-        'condominios': condominios,
         'usuarios': usuarios,
         'tipos_amonestacion': tipos_amonestacion,
         'motivos': motivos,
@@ -1243,45 +1241,48 @@ def amonestacion_edit(request, pk):
     amonestacion = get_object_or_404(Amonestacion, pk=pk)
 
     if request.method == 'POST':
-        condominio_id = request.POST.get('condominio')
-        usuario_id = request.POST.get('usuario')
+        usuario_reporta_id = request.POST.get('usuario_reporta')
         tipo_amonestacion = request.POST.get('tipo_amonestacion')
         motivo = request.POST.get('motivo_amonestacion')
-        descripcion = request.POST.get('descripcion_amonestacion')
+        motivo_detalle = request.POST.get('motivo_detalle')
         fecha = request.POST.get('fecha_amonestacion')
+        nombre_amonestado = request.POST.get('nombre_amonestado')
+        apellidos_amonestado = request.POST.get('apellidos_amonestado')
+        rut_amonestado = request.POST.get('rut_amonestado')
+        numero_departamento = request.POST.get('numero_departamento')
+        fecha_limite_pago = request.POST.get('fecha_limite_pago')
 
-        if not all([condominio_id, usuario_id, tipo_amonestacion, motivo, descripcion, fecha]):
+        if not all([usuario_reporta_id, tipo_amonestacion, motivo, fecha, nombre_amonestado, apellidos_amonestado, rut_amonestado]):
             messages.error(request, 'Por favor complete todos los campos requeridos.')
         else:
             try:
-                condominio = Condominio.objects.get(pk=condominio_id)
-                usuario = Usuario.objects.get(pk=usuario_id)
+                usuario_reporta = Usuario.objects.get(pk=usuario_reporta_id)
 
-                amonestacion.condominio = condominio
-                amonestacion.usuario = usuario
+                amonestacion.usuario_reporta = usuario_reporta
                 amonestacion.tipo_amonestacion = tipo_amonestacion
-                amonestacion.motivo_amonestacion = motivo
-                amonestacion.descripcion_amonestacion = descripcion
+                amonestacion.motivo = motivo
+                amonestacion.motivo_detalle = motivo_detalle
                 amonestacion.fecha_amonestacion = fecha
+                amonestacion.nombre_amonestado = nombre_amonestado
+                amonestacion.apellidos_amonestado = apellidos_amonestado
+                amonestacion.rut_amonestado = rut_amonestado
+                amonestacion.numero_departamento = numero_departamento
+                amonestacion.fecha_limite_pago = fecha_limite_pago if fecha_limite_pago else None
                 amonestacion.save()
 
                 messages.success(request, 'Amonestación actualizada exitosamente.')
                 return redirect('amonestacion_list')
-            except Condominio.DoesNotExist:
-                messages.error(request, 'El condominio seleccionado no existe.')
             except Usuario.DoesNotExist:
-                messages.error(request, 'El usuario seleccionado no existe.')
+                messages.error(request, 'El usuario que reporta no existe.')
             except Exception as e:
                 messages.error(request, f'Error al actualizar la amonestación: {str(e)}')
 
-    condominios = Condominio.objects.all().order_by('nombre_condominio')
-    usuarios = Usuario.objects.all().order_by('apellido_usuario', 'nombre_usuario')
-    tipos_amonestacion = Amonestacion.TIPOS_AMONESTACION
-    motivos = Amonestacion.MOTIVOS_AMONESTACION
+    usuarios = Usuario.objects.all().order_by('apellido', 'nombres')
+    tipos_amonestacion = Amonestacion.TipoAmonestacion.choices
+    motivos = Amonestacion.MotivoAmonestacion.choices
 
     return render(request, 'mi_condominio/amonestaciones/form.html', {
         'amonestacion': amonestacion,
-        'condominios': condominios,
         'usuarios': usuarios,
         'tipos_amonestacion': tipos_amonestacion,
         'motivos': motivos,
@@ -1294,9 +1295,9 @@ def amonestacion_delete(request, pk):
     amonestacion = get_object_or_404(Amonestacion, pk=pk)
 
     if request.method == 'POST':
-        usuario_nombre = f"{amonestacion.usuario.nombre_usuario} {amonestacion.usuario.apellido_usuario}"
+        amonestado_nombre = f"{amonestacion.nombre_amonestado} {amonestacion.apellidos_amonestado}"
         amonestacion.delete()
-        messages.success(request, f'Amonestación de {usuario_nombre} eliminada exitosamente.')
+        messages.success(request, f'Amonestación de {amonestado_nombre} eliminada exitosamente.')
         return redirect('amonestacion_list')
 
     return render(request, 'mi_condominio/amonestaciones/delete.html', {
