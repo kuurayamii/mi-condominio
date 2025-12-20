@@ -1,0 +1,84 @@
+{% extends 'mi_condominio/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Asistente IA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'mi_condominio/css/ai_chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                <i class="bi bi-robot me-2"></i>Asistente IA
+            </h2>
+            <p class="text-muted mb-0">
+                Pregunta sobre incidencias, estadísticas, tendencias y más.
+            </p>
+        </div>
+        <button type="button" class="btn btn-outline-secondary" id="clearChatBtn">
+            <i class="bi bi-trash me-2"></i>Nueva Conversación
+        </button>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-messages"
+             id="chatMessages"
+             data-send-url="{% url 'ai_chat_send' %}"
+             data-history-url="{% url 'ai_chat_history' %}"
+             data-clear-url="{% url 'ai_chat_clear' %}">
+
+            <div class="empty-state" id="emptyState">
+                <i class="bi bi-chat-dots"></i>
+                <h4>¡Hola! Soy tu asistente de condominios</h4>
+                <p>Puedo ayudarte con:</p>
+                <div class="suggested-questions">
+                    <div class="suggested-question" data-question="¿Cuántas incidencias abiertas hay actualmente?">
+                        <i class="bi bi-exclamation-circle text-warning me-2"></i>
+                        Ver incidencias abiertas
+                    </div>
+                    <div class="suggested-question" data-question="Muéstrame las estadísticas del dashboard">
+                        <i class="bi bi-graph-up text-primary me-2"></i>
+                        Estadísticas del sistema
+                    </div>
+                    <div class="suggested-question" data-question="¿Cuáles son las categorías de incidencias más comunes?">
+                        <i class="bi bi-pie-chart text-success me-2"></i>
+                        Tendencias de incidencias
+                    </div>
+                    <div class="suggested-question" data-question="¿Qué amonestaciones se han registrado este mes?">
+                        <i class="bi bi-shield-exclamation text-danger me-2"></i>
+                        Amonestaciones recientes
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <textarea
+                class="form-control chat-input"
+                id="chatInput"
+                placeholder="Escribe tu pregunta aquí... (Shift+Enter para nueva línea)"
+                rows="1"></textarea>
+            <button type="button" class="btn btn-primary btn-send" id="sendBtn">
+                <i class="bi bi-send me-2"></i>Enviar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Marked.js para renderizar Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- Script del chat -->
+<script src="{% static 'mi_condominio/js/ai_chat.js' %}"></script>
+{% endblock %}
