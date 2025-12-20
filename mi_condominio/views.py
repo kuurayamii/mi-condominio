@@ -7,6 +7,16 @@ from django.db import models
 from django.db.models import Q
 from .models import Condominio, Reunion, Usuario, Incidencia, CategoriaIncidencia, Bitacora, EvidenciaIncidencia, Amonestacion
 from django.contrib.auth.models import User
+from .forms import (
+    CondominioForm,
+    UsuarioForm,
+    ReunionForm,
+    IncidenciaForm,
+    CategoriaIncidenciaForm,
+    BitacoraForm,
+    EvidenciaIncidenciaForm,
+    AmonestacionForm
+)
 
 
 # TODO: Borrar esta vista después cuando ya no sea necesaria
@@ -115,37 +125,22 @@ def condominio_list(request):
 @login_required
 def condominio_create(request):
     """
-    Vista para crear un nuevo condominio.
+    Vista para crear un nuevo condominio usando Django Forms.
     """
     if request.method == 'POST':
-        # Obtener datos del formulario
-        rut = request.POST.get('rut')
-        nombre = request.POST.get('nombre')
-        direccion = request.POST.get('direccion')
-        region = request.POST.get('region')
-        comuna = request.POST.get('comuna')
-        mail_contacto = request.POST.get('mail_contacto')
-
-        # Validar que no exista un condominio con el mismo RUT
-        if Condominio.objects.filter(rut=rut).exists():
-            messages.error(request, 'Ya existe un condominio con este RUT.')
+        form = CondominioForm(request.POST)
+        if form.is_valid():
+            condominio = form.save()
+            messages.success(request, f'Condominio "{condominio.nombre}" creado exitosamente.')
+            return redirect('condominio_list')
         else:
-            try:
-                # Crear el condominio
-                condominio = Condominio.objects.create(
-                    rut=rut,
-                    nombre=nombre,
-                    direccion=direccion,
-                    region=region,
-                    comuna=comuna,
-                    mail_contacto=mail_contacto
-                )
-                messages.success(request, f'Condominio "{condominio.nombre}" creado exitosamente.')
-                return redirect('condominio_list')
-            except Exception as e:
-                messages.error(request, f'Error al crear el condominio: {str(e)}')
+            # Los errores se mostrarán automáticamente en el template
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = CondominioForm()
 
     return render(request, 'mi_condominio/condominios/form.html', {
+        'form': form,
         'action': 'Crear',
         'condominio': None,
     })
@@ -154,39 +149,23 @@ def condominio_create(request):
 @login_required
 def condominio_edit(request, pk):
     """
-    Vista para editar un condominio existente.
+    Vista para editar un condominio existente usando Django Forms.
     """
     condominio = get_object_or_404(Condominio, pk=pk)
 
     if request.method == 'POST':
-        # Obtener datos del formulario
-        rut = request.POST.get('rut')
-        nombre = request.POST.get('nombre')
-        direccion = request.POST.get('direccion')
-        region = request.POST.get('region')
-        comuna = request.POST.get('comuna')
-        mail_contacto = request.POST.get('mail_contacto')
-
-        # Validar que no exista otro condominio con el mismo RUT
-        if Condominio.objects.filter(rut=rut).exclude(pk=pk).exists():
-            messages.error(request, 'Ya existe otro condominio con este RUT.')
+        form = CondominioForm(request.POST, instance=condominio)
+        if form.is_valid():
+            condominio = form.save()
+            messages.success(request, f'Condominio "{condominio.nombre}" actualizado exitosamente.')
+            return redirect('condominio_list')
         else:
-            try:
-                # Actualizar el condominio
-                condominio.rut = rut
-                condominio.nombre = nombre
-                condominio.direccion = direccion
-                condominio.region = region
-                condominio.comuna = comuna
-                condominio.mail_contacto = mail_contacto
-                condominio.save()
-
-                messages.success(request, f'Condominio "{condominio.nombre}" actualizado exitosamente.')
-                return redirect('condominio_list')
-            except Exception as e:
-                messages.error(request, f'Error al actualizar el condominio: {str(e)}')
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = CondominioForm(instance=condominio)
 
     return render(request, 'mi_condominio/condominios/form.html', {
+        'form': form,
         'action': 'Editar',
         'condominio': condominio,
     })
@@ -258,92 +237,48 @@ def reunion_list(request):
 @login_required
 def reunion_create(request):
     """
-    Vista para crear una nueva reunión.
+    Vista para crear una nueva reunión usando Django Forms.
     """
     if request.method == 'POST':
-        # Obtener datos del formulario
-        condominio_id = request.POST.get('condominio')
-        tipo_reunion = request.POST.get('tipo_reunion')
-        nombre_reunion = request.POST.get('nombre_reunion')
-        fecha_reunion = request.POST.get('fecha_reunion')
-        lugar_reunion = request.POST.get('lugar_reunion')
-        motivo_reunion = request.POST.get('motivo_reunion')
-        acta_reunion_url = request.POST.get('acta_reunion_url')
-
-        try:
-            # Obtener el condominio
-            condominio = get_object_or_404(Condominio, pk=condominio_id)
-
-            # Crear la reunión
-            reunion = Reunion.objects.create(
-                condominio=condominio,
-                tipo_reunion=tipo_reunion,
-                nombre_reunion=nombre_reunion,
-                fecha_reunion=fecha_reunion,
-                lugar_reunion=lugar_reunion if lugar_reunion else None,
-                motivo_reunion=motivo_reunion if motivo_reunion else None,
-                acta_reunion_url=acta_reunion_url if acta_reunion_url else None,
-            )
+        form = ReunionForm(request.POST)
+        if form.is_valid():
+            reunion = form.save()
             messages.success(request, f'Reunión "{reunion.nombre_reunion}" creada exitosamente.')
             return redirect('reunion_list')
-        except Exception as e:
-            messages.error(request, f'Error al crear la reunión: {str(e)}')
-
-    # Obtener todos los condominios para el selector
-    condominios = Condominio.objects.all().order_by('nombre')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = ReunionForm()
 
     return render(request, 'mi_condominio/reuniones/form.html', {
+        'form': form,
         'action': 'Crear',
         'reunion': None,
-        'condominios': condominios,
-        'tipos_reunion': Reunion.TipoReunion.choices,
     })
 
 
 @login_required
 def reunion_edit(request, pk):
     """
-    Vista para editar una reunión existente.
+    Vista para editar una reunión existente usando Django Forms.
     """
     reunion = get_object_or_404(Reunion, pk=pk)
 
     if request.method == 'POST':
-        # Obtener datos del formulario
-        condominio_id = request.POST.get('condominio')
-        tipo_reunion = request.POST.get('tipo_reunion')
-        nombre_reunion = request.POST.get('nombre_reunion')
-        fecha_reunion = request.POST.get('fecha_reunion')
-        lugar_reunion = request.POST.get('lugar_reunion')
-        motivo_reunion = request.POST.get('motivo_reunion')
-        acta_reunion_url = request.POST.get('acta_reunion_url')
-
-        try:
-            # Obtener el condominio
-            condominio = get_object_or_404(Condominio, pk=condominio_id)
-
-            # Actualizar la reunión
-            reunion.condominio = condominio
-            reunion.tipo_reunion = tipo_reunion
-            reunion.nombre_reunion = nombre_reunion
-            reunion.fecha_reunion = fecha_reunion
-            reunion.lugar_reunion = lugar_reunion if lugar_reunion else None
-            reunion.motivo_reunion = motivo_reunion if motivo_reunion else None
-            reunion.acta_reunion_url = acta_reunion_url if acta_reunion_url else None
-            reunion.save()
-
+        form = ReunionForm(request.POST, instance=reunion)
+        if form.is_valid():
+            reunion = form.save()
             messages.success(request, f'Reunión "{reunion.nombre_reunion}" actualizada exitosamente.')
             return redirect('reunion_list')
-        except Exception as e:
-            messages.error(request, f'Error al actualizar la reunión: {str(e)}')
-
-    # Obtener todos los condominios para el selector
-    condominios = Condominio.objects.all().order_by('nombre')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = ReunionForm(instance=reunion)
 
     return render(request, 'mi_condominio/reuniones/form.html', {
+        'form': form,
         'action': 'Editar',
         'reunion': reunion,
-        'condominios': condominios,
-        'tipos_reunion': Reunion.TipoReunion.choices,
     })
 
 
@@ -418,142 +353,87 @@ def usuario_list(request):
 @login_required
 def usuario_create(request):
     """
-    Vista para crear un nuevo usuario.
+    Vista para crear un nuevo usuario usando Django Forms.
     Crea automáticamente un User de Django vinculado.
     """
     if request.method == 'POST':
-        # Obtener datos del formulario
-        condominio_id = request.POST.get('condominio')
-        nombres = request.POST.get('nombres')
-        apellido = request.POST.get('apellido')
-        genero = request.POST.get('genero')
-        rut = request.POST.get('rut')
-        correo = request.POST.get('correo')
-        residencia = request.POST.get('residencia')
-        tipo_usuario = request.POST.get('tipo_usuario')
-        estado_cuenta = request.POST.get('estado_cuenta')
+        form = UsuarioForm(request.POST)
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Validaciones
-        if Usuario.objects.filter(rut=rut).exists():
-            messages.error(request, 'Ya existe un usuario con este RUT.')
-        elif Usuario.objects.filter(correo=correo).exists():
-            messages.error(request, 'Ya existe un usuario con este correo.')
-        elif User.objects.filter(username=username).exists():
+        # Validar username único
+        if User.objects.filter(username=username).exists():
             messages.error(request, 'Ya existe un usuario con este nombre de usuario.')
-        else:
+            form.add_error(None, 'El nombre de usuario ya está en uso.')
+        elif form.is_valid():
             try:
-                # Obtener el condominio
-                condominio = get_object_or_404(Condominio, pk=condominio_id)
-
-                # Crear User de Django
+                # Crear User de Django primero
                 django_user = User.objects.create_user(
                     username=username,
-                    email=correo,
+                    email=form.cleaned_data['correo'],
                     password=password,
-                    first_name=nombres,
-                    last_name=apellido
+                    first_name=form.cleaned_data['nombres'],
+                    last_name=form.cleaned_data['apellido']
                 )
 
-                # Crear el usuario del sistema
-                usuario = Usuario.objects.create(
-                    user=django_user,
-                    condominio=condominio,
-                    nombres=nombres,
-                    apellido=apellido,
-                    genero=genero if genero else None,
-                    rut=rut,
-                    correo=correo,
-                    residencia=residencia if residencia else None,
-                    tipo_usuario=tipo_usuario,
-                    estado_cuenta=estado_cuenta,
-                )
+                # Crear usuario del sistema
+                usuario = form.save(commit=False)
+                usuario.user = django_user
+                usuario.save()
 
                 messages.success(request, f'Usuario "{usuario.nombres} {usuario.apellido}" creado exitosamente.')
                 return redirect('usuario_list')
             except Exception as e:
                 messages.error(request, f'Error al crear el usuario: {str(e)}')
-
-    # Obtener condominios para el selector
-    condominios = Condominio.objects.all().order_by('nombre')
+                # Rollback: eliminar User de Django si falla la creación del Usuario
+                if 'django_user' in locals():
+                    django_user.delete()
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = UsuarioForm()
 
     return render(request, 'mi_condominio/usuarios/form.html', {
+        'form': form,
         'action': 'Crear',
         'usuario': None,
-        'condominios': condominios,
-        'generos': Usuario.Genero.choices,
-        'tipos_usuario': Usuario.TipoUsuario.choices,
-        'estados_cuenta': Usuario.EstadoCuenta.choices,
     })
 
 
 @login_required
 def usuario_edit(request, pk):
     """
-    Vista para editar un usuario existente.
+    Vista para editar un usuario existente usando Django Forms.
     """
     usuario = get_object_or_404(Usuario, pk=pk)
 
     if request.method == 'POST':
-        # Obtener datos del formulario
-        condominio_id = request.POST.get('condominio')
-        nombres = request.POST.get('nombres')
-        apellido = request.POST.get('apellido')
-        genero = request.POST.get('genero')
-        rut = request.POST.get('rut')
-        correo = request.POST.get('correo')
-        residencia = request.POST.get('residencia')
-        tipo_usuario = request.POST.get('tipo_usuario')
-        estado_cuenta = request.POST.get('estado_cuenta')
+        form = UsuarioForm(request.POST, instance=usuario)
         password = request.POST.get('password')
 
-        # Validar RUT y correo únicos
-        if Usuario.objects.filter(rut=rut).exclude(pk=pk).exists():
-            messages.error(request, 'Ya existe otro usuario con este RUT.')
-        elif Usuario.objects.filter(correo=correo).exclude(pk=pk).exists():
-            messages.error(request, 'Ya existe otro usuario con este correo.')
+        if form.is_valid():
+            usuario = form.save()
+
+            # Actualizar User de Django si existe
+            if usuario.user:
+                usuario.user.email = usuario.correo
+                usuario.user.first_name = usuario.nombres
+                usuario.user.last_name = usuario.apellido
+                if password:  # Solo actualizar password si se proporcionó
+                    usuario.user.set_password(password)
+                usuario.user.save()
+
+            messages.success(request, f'Usuario "{usuario.nombres} {usuario.apellido}" actualizado exitosamente.')
+            return redirect('usuario_list')
         else:
-            try:
-                # Obtener el condominio
-                condominio = get_object_or_404(Condominio, pk=condominio_id)
-
-                # Actualizar el usuario
-                usuario.condominio = condominio
-                usuario.nombres = nombres
-                usuario.apellido = apellido
-                usuario.genero = genero if genero else None
-                usuario.rut = rut
-                usuario.correo = correo
-                usuario.residencia = residencia if residencia else None
-                usuario.tipo_usuario = tipo_usuario
-                usuario.estado_cuenta = estado_cuenta
-                usuario.save()
-
-                # Actualizar User de Django si existe
-                if usuario.user:
-                    usuario.user.first_name = nombres
-                    usuario.user.last_name = apellido
-                    usuario.user.email = correo
-                    if password:  # Solo actualizar password si se proporcionó uno nuevo
-                        usuario.user.set_password(password)
-                    usuario.user.save()
-
-                messages.success(request, f'Usuario "{usuario.nombres} {usuario.apellido}" actualizado exitosamente.')
-                return redirect('usuario_list')
-            except Exception as e:
-                messages.error(request, f'Error al actualizar el usuario: {str(e)}')
-
-    # Obtener condominios para el selector
-    condominios = Condominio.objects.all().order_by('nombre')
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = UsuarioForm(instance=usuario)
 
     return render(request, 'mi_condominio/usuarios/form.html', {
+        'form': form,
         'action': 'Editar',
         'usuario': usuario,
-        'condominios': condominios,
-        'generos': Usuario.Genero.choices,
-        'tipos_usuario': Usuario.TipoUsuario.choices,
-        'estados_cuenta': Usuario.EstadoCuenta.choices,
     })
 
 
@@ -646,120 +526,48 @@ def incidencia_list(request):
 @login_required
 def incidencia_create(request):
     """
-    Vista para crear una nueva incidencia.
+    Vista para crear una nueva incidencia usando Django Forms.
     """
     if request.method == 'POST':
-        # Obtener datos del formulario
-        condominio_id = request.POST.get('condominio')
-        tipo_incidencia_id = request.POST.get('tipo_incidencia')
-        titulo = request.POST.get('titulo')
-        descripcion = request.POST.get('descripcion')
-        estado = request.POST.get('estado')
-        prioridad = request.POST.get('prioridad')
-        ubicacion_latitud = request.POST.get('ubicacion_latitud')
-        ubicacion_longitud = request.POST.get('ubicacion_longitud')
-        direccion_incidencia = request.POST.get('direccion_incidencia')
-        usuario_reporta_id = request.POST.get('usuario_reporta')
-
-        try:
-            # Obtener objetos relacionados
-            condominio = get_object_or_404(Condominio, pk=condominio_id)
-            tipo_incidencia = get_object_or_404(CategoriaIncidencia, pk=tipo_incidencia_id)
-            usuario_reporta = get_object_or_404(Usuario, pk=usuario_reporta_id)
-
-            # Crear la incidencia
-            incidencia = Incidencia.objects.create(
-                condominio=condominio,
-                tipo_incidencia=tipo_incidencia,
-                titulo=titulo,
-                descripcion=descripcion if descripcion else None,
-                estado=estado,
-                prioridad=prioridad,
-                ubicacion_latitud_reporte=ubicacion_latitud if ubicacion_latitud else None,
-                ubicacion_longitud_reporte=ubicacion_longitud if ubicacion_longitud else None,
-                direccion_condominio_incidencia=direccion_incidencia if direccion_incidencia else None,
-                usuario_reporta=usuario_reporta,
-            )
+        form = IncidenciaForm(request.POST)
+        if form.is_valid():
+            incidencia = form.save()
             messages.success(request, f'Incidencia "{incidencia.titulo}" creada exitosamente.')
             return redirect('incidencia_list')
-        except Exception as e:
-            messages.error(request, f'Error al crear la incidencia: {str(e)}')
-
-    # Obtener datos para el formulario
-    condominios = Condominio.objects.all().order_by('nombre')
-    categorias = CategoriaIncidencia.objects.all().order_by('nombre_categoria_incidencia')
-    usuarios = Usuario.objects.filter(estado_cuenta='ACTIVO').select_related('condominio').order_by('apellido', 'nombres')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = IncidenciaForm()
 
     return render(request, 'mi_condominio/incidencias/form.html', {
+        'form': form,
         'action': 'Crear',
         'incidencia': None,
-        'condominios': condominios,
-        'categorias': categorias,
-        'usuarios': usuarios,
-        'estados': Incidencia.Estado.choices,
-        'prioridades': Incidencia.Prioridad.choices,
     })
 
 
 @login_required
 def incidencia_edit(request, pk):
     """
-    Vista para editar una incidencia existente.
+    Vista para editar una incidencia existente usando Django Forms.
     """
     incidencia = get_object_or_404(Incidencia, pk=pk)
 
     if request.method == 'POST':
-        # Obtener datos del formulario
-        condominio_id = request.POST.get('condominio')
-        tipo_incidencia_id = request.POST.get('tipo_incidencia')
-        titulo = request.POST.get('titulo')
-        descripcion = request.POST.get('descripcion')
-        estado = request.POST.get('estado')
-        prioridad = request.POST.get('prioridad')
-        ubicacion_latitud = request.POST.get('ubicacion_latitud')
-        ubicacion_longitud = request.POST.get('ubicacion_longitud')
-        direccion_incidencia = request.POST.get('direccion_incidencia')
-        usuario_reporta_id = request.POST.get('usuario_reporta')
-        fecha_cierre = request.POST.get('fecha_cierre')
-
-        try:
-            # Obtener objetos relacionados
-            condominio = get_object_or_404(Condominio, pk=condominio_id)
-            tipo_incidencia = get_object_or_404(CategoriaIncidencia, pk=tipo_incidencia_id)
-            usuario_reporta = get_object_or_404(Usuario, pk=usuario_reporta_id)
-
-            # Actualizar la incidencia
-            incidencia.condominio = condominio
-            incidencia.tipo_incidencia = tipo_incidencia
-            incidencia.titulo = titulo
-            incidencia.descripcion = descripcion if descripcion else None
-            incidencia.estado = estado
-            incidencia.prioridad = prioridad
-            incidencia.ubicacion_latitud_reporte = ubicacion_latitud if ubicacion_latitud else None
-            incidencia.ubicacion_longitud_reporte = ubicacion_longitud if ubicacion_longitud else None
-            incidencia.direccion_condominio_incidencia = direccion_incidencia if direccion_incidencia else None
-            incidencia.usuario_reporta = usuario_reporta
-            incidencia.fecha_cierre = fecha_cierre if fecha_cierre else None
-            incidencia.save()
-
+        form = IncidenciaForm(request.POST, instance=incidencia)
+        if form.is_valid():
+            incidencia = form.save()
             messages.success(request, f'Incidencia "{incidencia.titulo}" actualizada exitosamente.')
             return redirect('incidencia_list')
-        except Exception as e:
-            messages.error(request, f'Error al actualizar la incidencia: {str(e)}')
-
-    # Obtener datos para el formulario
-    condominios = Condominio.objects.all().order_by('nombre')
-    categorias = CategoriaIncidencia.objects.all().order_by('nombre_categoria_incidencia')
-    usuarios = Usuario.objects.filter(estado_cuenta='ACTIVO').select_related('condominio').order_by('apellido', 'nombres')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = IncidenciaForm(instance=incidencia)
 
     return render(request, 'mi_condominio/incidencias/form.html', {
+        'form': form,
         'action': 'Editar',
         'incidencia': incidencia,
-        'condominios': condominios,
-        'categorias': categorias,
-        'usuarios': usuarios,
-        'estados': Incidencia.Estado.choices,
-        'prioridades': Incidencia.Prioridad.choices,
     })
 
 
@@ -813,25 +621,21 @@ def categoria_list(request):
 @login_required
 def categoria_create(request):
     """
-    Vista para crear una nueva categoría de incidencia.
+    Vista para crear una nueva categoría usando Django Forms.
     """
     if request.method == 'POST':
-        nombre_categoria = request.POST.get('nombre_categoria_incidencia')
-
-        # Validar que no exista una categoría con el mismo nombre
-        if CategoriaIncidencia.objects.filter(nombre_categoria_incidencia__iexact=nombre_categoria).exists():
-            messages.error(request, 'Ya existe una categoría con este nombre.')
+        form = CategoriaIncidenciaForm(request.POST)
+        if form.is_valid():
+            categoria = form.save()
+            messages.success(request, f'Categoría "{categoria.nombre_categoria_incidencia}" creada exitosamente.')
+            return redirect('categoria_list')
         else:
-            try:
-                categoria = CategoriaIncidencia.objects.create(
-                    nombre_categoria_incidencia=nombre_categoria
-                )
-                messages.success(request, f'Categoría "{categoria.nombre_categoria_incidencia}" creada exitosamente.')
-                return redirect('categoria_list')
-            except Exception as e:
-                messages.error(request, f'Error al crear la categoría: {str(e)}')
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = CategoriaIncidenciaForm()
 
     return render(request, 'mi_condominio/categorias/form.html', {
+        'form': form,
         'action': 'Crear',
         'categoria': None,
     })
@@ -840,28 +644,23 @@ def categoria_create(request):
 @login_required
 def categoria_edit(request, pk):
     """
-    Vista para editar una categoría existente.
+    Vista para editar una categoría existente usando Django Forms.
     """
     categoria = get_object_or_404(CategoriaIncidencia, pk=pk)
 
     if request.method == 'POST':
-        nombre_categoria = request.POST.get('nombre_categoria_incidencia')
-
-        # Validar que no exista otra categoría con el mismo nombre
-        if CategoriaIncidencia.objects.filter(
-            nombre_categoria_incidencia__iexact=nombre_categoria
-        ).exclude(pk=pk).exists():
-            messages.error(request, 'Ya existe otra categoría con este nombre.')
+        form = CategoriaIncidenciaForm(request.POST, instance=categoria)
+        if form.is_valid():
+            categoria = form.save()
+            messages.success(request, f'Categoría "{categoria.nombre_categoria_incidencia}" actualizada exitosamente.')
+            return redirect('categoria_list')
         else:
-            try:
-                categoria.nombre_categoria_incidencia = nombre_categoria
-                categoria.save()
-                messages.success(request, f'Categoría "{categoria.nombre_categoria_incidencia}" actualizada exitosamente.')
-                return redirect('categoria_list')
-            except Exception as e:
-                messages.error(request, f'Error al actualizar la categoría: {str(e)}')
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = CategoriaIncidenciaForm(instance=categoria)
 
     return render(request, 'mi_condominio/categorias/form.html', {
+        'form': form,
         'action': 'Editar',
         'categoria': categoria,
     })
@@ -933,68 +732,48 @@ def bitacora_list(request):
 @login_required
 def bitacora_create(request):
     """
-    Vista para crear una nueva bitácora.
+    Vista para crear una nueva bitácora usando Django Forms.
     """
     if request.method == 'POST':
-        incidencia_id = request.POST.get('incidencia')
-        detalle = request.POST.get('detalle')
-        accion = request.POST.get('accion')
-
-        try:
-            incidencia = get_object_or_404(Incidencia, pk=incidencia_id)
-
-            bitacora = Bitacora.objects.create(
-                incidencia=incidencia,
-                detalle=detalle if detalle else None,
-                accion=accion if accion else None,
-            )
-            messages.success(request, f'Registro de bitácora creado exitosamente para "{incidencia.titulo}".')
+        form = BitacoraForm(request.POST)
+        if form.is_valid():
+            bitacora = form.save()
+            messages.success(request, f'Registro de bitácora creado exitosamente para "{bitacora.incidencia.titulo}".')
             return redirect('bitacora_list')
-        except Exception as e:
-            messages.error(request, f'Error al crear el registro: {str(e)}')
-
-    # Obtener todas las incidencias para el selector
-    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = BitacoraForm()
 
     return render(request, 'mi_condominio/bitacoras/form.html', {
+        'form': form,
         'action': 'Crear',
         'bitacora': None,
-        'incidencias': incidencias,
     })
 
 
 @login_required
 def bitacora_edit(request, pk):
     """
-    Vista para editar una bitácora existente.
+    Vista para editar una bitácora existente usando Django Forms.
     """
     bitacora = get_object_or_404(Bitacora, pk=pk)
 
     if request.method == 'POST':
-        incidencia_id = request.POST.get('incidencia')
-        detalle = request.POST.get('detalle')
-        accion = request.POST.get('accion')
-
-        try:
-            incidencia = get_object_or_404(Incidencia, pk=incidencia_id)
-
-            bitacora.incidencia = incidencia
-            bitacora.detalle = detalle if detalle else None
-            bitacora.accion = accion if accion else None
-            bitacora.save()
-
+        form = BitacoraForm(request.POST, instance=bitacora)
+        if form.is_valid():
+            bitacora = form.save()
             messages.success(request, f'Registro de bitácora actualizado exitosamente.')
             return redirect('bitacora_list')
-        except Exception as e:
-            messages.error(request, f'Error al actualizar el registro: {str(e)}')
-
-    # Obtener todas las incidencias para el selector
-    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = BitacoraForm(instance=bitacora)
 
     return render(request, 'mi_condominio/bitacoras/form.html', {
+        'form': form,
         'action': 'Editar',
         'bitacora': bitacora,
-        'incidencias': incidencias,
     })
 
 
@@ -1038,13 +817,13 @@ def evidencia_list(request):
 
     if search:
         evidencias = evidencias.filter(
-            Q(incidencia__titulo_incidencia__icontains=search) |
-            Q(url_archivo_evidencia__icontains=search)
+            Q(incidencia__titulo__icontains=search) |
+            Q(archivo_evidencia__icontains=search)
         )
 
     # Para los filtros
     incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
-    tipos_archivo = EvidenciaIncidencia.TIPOS_ARCHIVO
+    tipos_archivo = EvidenciaIncidencia.TipoArchivo.choices
 
     return render(request, 'mi_condominio/evidencias/list.html', {
         'evidencias': evidencias,
@@ -1055,84 +834,66 @@ def evidencia_list(request):
 
 @login_required
 def evidencia_create(request):
+    """
+    Vista para crear una nueva evidencia con upload de archivo.
+    """
     if request.method == 'POST':
-        incidencia_id = request.POST.get('incidencia')
-        url_archivo = request.POST.get('url_archivo_evidencia')
-        tipo_archivo = request.POST.get('tipo_archivo_evidencia')
-
-        if not incidencia_id or not url_archivo or not tipo_archivo:
-            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        form = EvidenciaIncidenciaForm(request.POST, request.FILES)
+        if form.is_valid():
+            evidencia = form.save()
+            messages.success(request, f'Evidencia agregada exitosamente a la incidencia "{evidencia.incidencia.titulo}".')
+            return redirect('evidencia_list')
         else:
-            try:
-                incidencia = Incidencia.objects.get(pk=incidencia_id)
-
-                evidencia = EvidenciaIncidencia.objects.create(
-                    incidencia=incidencia,
-                    url_archivo_evidencia=url_archivo,
-                    tipo_archivo_evidencia=tipo_archivo
-                )
-
-                messages.success(request, f'Evidencia agregada exitosamente a la incidencia "{incidencia.titulo_incidencia}".')
-                return redirect('evidencia_list')
-            except Incidencia.DoesNotExist:
-                messages.error(request, 'La incidencia seleccionada no existe.')
-            except Exception as e:
-                messages.error(request, f'Error al crear la evidencia: {str(e)}')
-
-    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
-    tipos_archivo = EvidenciaIncidencia.TIPOS_ARCHIVO
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = EvidenciaIncidenciaForm()
 
     return render(request, 'mi_condominio/evidencias/form.html', {
-        'incidencias': incidencias,
-        'tipos_archivo': tipos_archivo,
-        'is_edit': False,
+        'form': form,
+        'action': 'Crear',
+        'evidencia': None,
     })
 
 
 @login_required
 def evidencia_edit(request, pk):
+    """
+    Vista para editar una evidencia existente con opción de reemplazar archivo.
+    """
     evidencia = get_object_or_404(EvidenciaIncidencia, pk=pk)
 
     if request.method == 'POST':
-        incidencia_id = request.POST.get('incidencia')
-        url_archivo = request.POST.get('url_archivo_evidencia')
-        tipo_archivo = request.POST.get('tipo_archivo_evidencia')
-
-        if not incidencia_id or not url_archivo or not tipo_archivo:
-            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        form = EvidenciaIncidenciaForm(request.POST, request.FILES, instance=evidencia)
+        if form.is_valid():
+            evidencia = form.save()
+            messages.success(request, 'Evidencia actualizada exitosamente.')
+            return redirect('evidencia_list')
         else:
-            try:
-                incidencia = Incidencia.objects.get(pk=incidencia_id)
-
-                evidencia.incidencia = incidencia
-                evidencia.url_archivo_evidencia = url_archivo
-                evidencia.tipo_archivo_evidencia = tipo_archivo
-                evidencia.save()
-
-                messages.success(request, 'Evidencia actualizada exitosamente.')
-                return redirect('evidencia_list')
-            except Incidencia.DoesNotExist:
-                messages.error(request, 'La incidencia seleccionada no existe.')
-            except Exception as e:
-                messages.error(request, f'Error al actualizar la evidencia: {str(e)}')
-
-    incidencias = Incidencia.objects.select_related('condominio').all().order_by('-id')
-    tipos_archivo = EvidenciaIncidencia.TIPOS_ARCHIVO
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = EvidenciaIncidenciaForm(instance=evidencia)
 
     return render(request, 'mi_condominio/evidencias/form.html', {
+        'form': form,
+        'action': 'Editar',
         'evidencia': evidencia,
-        'incidencias': incidencias,
-        'tipos_archivo': tipos_archivo,
-        'is_edit': True,
     })
 
 
 @login_required
 def evidencia_delete(request, pk):
+    """
+    Vista para eliminar una evidencia y su archivo asociado del servidor.
+    """
     evidencia = get_object_or_404(EvidenciaIncidencia, pk=pk)
 
     if request.method == 'POST':
-        incidencia_titulo = evidencia.incidencia.titulo_incidencia
+        incidencia_titulo = evidencia.incidencia.titulo
+
+        # Eliminar el archivo del servidor antes de eliminar el registro
+        if evidencia.archivo_evidencia:
+            evidencia.archivo_evidencia.delete(save=False)
+
         evidencia.delete()
         messages.success(request, f'Evidencia de "{incidencia_titulo}" eliminada exitosamente.')
         return redirect('evidencia_list')
@@ -1186,107 +947,49 @@ def amonestacion_list(request):
 
 @login_required
 def amonestacion_create(request):
+    """
+    Vista para crear una nueva amonestación usando Django Forms.
+    """
     if request.method == 'POST':
-        usuario_reporta_id = request.POST.get('usuario_reporta')
-        tipo_amonestacion = request.POST.get('tipo_amonestacion')
-        motivo = request.POST.get('motivo_amonestacion')
-        motivo_detalle = request.POST.get('motivo_detalle')
-        fecha = request.POST.get('fecha_amonestacion')
-        nombre_amonestado = request.POST.get('nombre_amonestado')
-        apellidos_amonestado = request.POST.get('apellidos_amonestado')
-        rut_amonestado = request.POST.get('rut_amonestado')
-        numero_departamento = request.POST.get('numero_departamento')
-        fecha_limite_pago = request.POST.get('fecha_limite_pago')
-
-        if not all([usuario_reporta_id, tipo_amonestacion, motivo, fecha, nombre_amonestado, apellidos_amonestado, rut_amonestado]):
-            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        form = AmonestacionForm(request.POST)
+        if form.is_valid():
+            amonestacion = form.save()
+            messages.success(request, f'Amonestación registrada exitosamente para {amonestacion.nombre_amonestado} {amonestacion.apellidos_amonestado}.')
+            return redirect('amonestacion_list')
         else:
-            try:
-                usuario_reporta = Usuario.objects.get(pk=usuario_reporta_id)
-
-                amonestacion = Amonestacion.objects.create(
-                    usuario_reporta=usuario_reporta,
-                    tipo_amonestacion=tipo_amonestacion,
-                    motivo=motivo,
-                    motivo_detalle=motivo_detalle,
-                    fecha_amonestacion=fecha,
-                    nombre_amonestado=nombre_amonestado,
-                    apellidos_amonestado=apellidos_amonestado,
-                    rut_amonestado=rut_amonestado,
-                    numero_departamento=numero_departamento,
-                    fecha_limite_pago=fecha_limite_pago if fecha_limite_pago else None
-                )
-
-                messages.success(request, f'Amonestación registrada exitosamente para {nombre_amonestado} {apellidos_amonestado}.')
-                return redirect('amonestacion_list')
-            except Usuario.DoesNotExist:
-                messages.error(request, 'El usuario que reporta no existe.')
-            except Exception as e:
-                messages.error(request, f'Error al crear la amonestación: {str(e)}')
-
-    usuarios = Usuario.objects.all().order_by('apellido', 'nombres')
-    tipos_amonestacion = Amonestacion.TipoAmonestacion.choices
-    motivos = Amonestacion.MotivoAmonestacion.choices
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = AmonestacionForm()
 
     return render(request, 'mi_condominio/amonestaciones/form.html', {
-        'usuarios': usuarios,
-        'tipos_amonestacion': tipos_amonestacion,
-        'motivos': motivos,
-        'is_edit': False,
+        'form': form,
+        'action': 'Crear',
+        'amonestacion': None,
     })
 
 
 @login_required
 def amonestacion_edit(request, pk):
+    """
+    Vista para editar una amonestación existente usando Django Forms.
+    """
     amonestacion = get_object_or_404(Amonestacion, pk=pk)
 
     if request.method == 'POST':
-        usuario_reporta_id = request.POST.get('usuario_reporta')
-        tipo_amonestacion = request.POST.get('tipo_amonestacion')
-        motivo = request.POST.get('motivo_amonestacion')
-        motivo_detalle = request.POST.get('motivo_detalle')
-        fecha = request.POST.get('fecha_amonestacion')
-        nombre_amonestado = request.POST.get('nombre_amonestado')
-        apellidos_amonestado = request.POST.get('apellidos_amonestado')
-        rut_amonestado = request.POST.get('rut_amonestado')
-        numero_departamento = request.POST.get('numero_departamento')
-        fecha_limite_pago = request.POST.get('fecha_limite_pago')
-
-        if not all([usuario_reporta_id, tipo_amonestacion, motivo, fecha, nombre_amonestado, apellidos_amonestado, rut_amonestado]):
-            messages.error(request, 'Por favor complete todos los campos requeridos.')
+        form = AmonestacionForm(request.POST, instance=amonestacion)
+        if form.is_valid():
+            amonestacion = form.save()
+            messages.success(request, 'Amonestación actualizada exitosamente.')
+            return redirect('amonestacion_list')
         else:
-            try:
-                usuario_reporta = Usuario.objects.get(pk=usuario_reporta_id)
-
-                amonestacion.usuario_reporta = usuario_reporta
-                amonestacion.tipo_amonestacion = tipo_amonestacion
-                amonestacion.motivo = motivo
-                amonestacion.motivo_detalle = motivo_detalle
-                amonestacion.fecha_amonestacion = fecha
-                amonestacion.nombre_amonestado = nombre_amonestado
-                amonestacion.apellidos_amonestado = apellidos_amonestado
-                amonestacion.rut_amonestado = rut_amonestado
-                amonestacion.numero_departamento = numero_departamento
-                amonestacion.fecha_limite_pago = fecha_limite_pago if fecha_limite_pago else None
-                amonestacion.save()
-
-                messages.success(request, 'Amonestación actualizada exitosamente.')
-                return redirect('amonestacion_list')
-            except Usuario.DoesNotExist:
-                messages.error(request, 'El usuario que reporta no existe.')
-            except Exception as e:
-                messages.error(request, f'Error al actualizar la amonestación: {str(e)}')
-
-    usuarios = Usuario.objects.all().order_by('apellido', 'nombres')
-    tipos_amonestacion = Amonestacion.TipoAmonestacion.choices
-    motivos = Amonestacion.MotivoAmonestacion.choices
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
+    else:
+        form = AmonestacionForm(instance=amonestacion)
 
     return render(request, 'mi_condominio/amonestaciones/form.html', {
+        'form': form,
+        'action': 'Editar',
         'amonestacion': amonestacion,
-        'usuarios': usuarios,
-        'tipos_amonestacion': tipos_amonestacion,
-        'motivos': motivos,
-        'is_edit': True,
     })
 
 
@@ -1304,3 +1007,163 @@ def amonestacion_delete(request, pk):
         'amonestacion': amonestacion,
     })
 
+
+# ==================== VISTAS PARA ASISTENTE DE IA ====================
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from . import ai_assistant
+
+
+@login_required
+def ai_chat_interface(request):
+    """Vista principal del chat con el asistente de IA"""
+    return render(request, 'mi_condominio/ai_chat/chat.html')
+
+
+@login_required
+@require_POST
+def ai_chat_send_message(request):
+    """API endpoint para enviar un mensaje al asistente"""
+    import json
+
+    try:
+        data = json.loads(request.body)
+        mensaje = data.get('mensaje', '').strip()
+
+        if not mensaje:
+            return JsonResponse({
+                'exito': False,
+                'error': 'El mensaje no puede estar vacío'
+            }, status=400)
+
+        # Obtener el usuario actual (necesitas tener el modelo Usuario vinculado con el User de Django)
+        try:
+            usuario = Usuario.objects.get(correo=request.user.email)
+        except Usuario.DoesNotExist:
+            return JsonResponse({
+                'exito': False,
+                'error': 'Usuario no encontrado en el sistema'
+            }, status=404)
+
+        # Procesar el mensaje con el asistente
+        resultado = ai_assistant.chat(usuario, mensaje)
+
+        return JsonResponse(resultado)
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'exito': False,
+            'error': 'Formato de JSON inválido'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'exito': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+def ai_chat_history(request):
+    """API endpoint para obtener el historial de la sesión actual"""
+    try:
+        usuario = Usuario.objects.get(correo=request.user.email)
+        session = ai_assistant.get_or_create_session(usuario)
+        history = ai_assistant.get_session_history(session.id)
+
+        return JsonResponse(history)
+
+    except Usuario.DoesNotExist:
+        return JsonResponse({
+            'exito': False,
+            'error': 'Usuario no encontrado'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'exito': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_POST
+def ai_chat_clear(request):
+    """API endpoint para limpiar la sesión y comenzar una nueva conversación"""
+    try:
+        usuario = Usuario.objects.get(correo=request.user.email)
+        resultado = ai_assistant.clear_session(usuario)
+
+        return JsonResponse(resultado)
+
+    except Usuario.DoesNotExist:
+        return JsonResponse({
+            'exito': False,
+            'error': 'Usuario no encontrado'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'exito': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_POST
+def ai_chat_confirm_action(request):
+    """API endpoint para ejecutar una acción después de la confirmación del usuario"""
+    try:
+        data = json.loads(request.body)
+        accion = data.get('accion')
+        datos = data.get('datos')
+
+        if not accion or not datos:
+            return JsonResponse({
+                'exito': False,
+                'error': 'Faltan parámetros: accion y datos son requeridos'
+            }, status=400)
+
+        # Importar las funciones de ejecución
+        from . import ai_tools
+
+        # Ejecutar la acción correspondiente
+        if accion in ai_tools.EXECUTION_FUNCTIONS:
+            resultado = ai_tools.EXECUTION_FUNCTIONS[accion](datos)
+
+            # Guardar en el historial del chat el resultado
+            usuario = Usuario.objects.get(correo=request.user.email)
+            session = ai_assistant.get_or_create_session(usuario)
+
+            if resultado.get('exito'):
+                mensaje_confirmacion = f"✓ {resultado['mensaje']}"
+            else:
+                mensaje_confirmacion = f"✗ Error: {resultado.get('error', 'Error desconocido')}"
+
+            # Crear mensaje del asistente con el resultado
+            ChatMessage.objects.create(
+                sesion=session,
+                role='assistant',
+                contenido=mensaje_confirmacion
+            )
+
+            return JsonResponse(resultado)
+        else:
+            return JsonResponse({
+                'exito': False,
+                'error': f'Acción "{accion}" no reconocida'
+            }, status=400)
+
+    except Usuario.DoesNotExist:
+        return JsonResponse({
+            'exito': False,
+            'error': 'Usuario no encontrado'
+        }, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'exito': False,
+            'error': 'JSON inválido'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'exito': False,
+            'error': str(e)
+        }, status=500)
