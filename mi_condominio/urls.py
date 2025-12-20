@@ -14,6 +14,9 @@ urlpatterns = [
     path("condominios/<int:pk>/editar/", views.condominio_edit, name="condominio_edit"),
     path("condominios/<int:pk>/eliminar/", views.condominio_delete, name="condominio_delete"),
 
+    # API para obtener comunas por región
+    path("api/comunas/<int:region_id>/", views.get_comunas_by_region, name="get_comunas_by_region"),
+
     # URLs para gestión de reuniones
     path("reuniones/", views.reunion_list, name="reunion_list"),
     path("reuniones/crear/", views.reunion_create, name="reunion_create"),

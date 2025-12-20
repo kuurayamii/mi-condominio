@@ -72,7 +72,7 @@ def validate_fecha_no_muy_futura(value, max_years=5):
 # ==================== FORMULARIOS ====================
 
 class CondominioForm(forms.ModelForm):
-    """Formulario para crear/editar Condominios."""
+    """Formulario para crear/editar Condominios con selección dinámica de región y comuna."""
 
     class Meta:
         model = Condominio
@@ -92,29 +92,12 @@ class CondominioForm(forms.ModelForm):
                 'placeholder': 'Dirección completa'
             }),
             'region': forms.Select(attrs={
-                'class': 'form-select'
-            }, choices=[
-                ('', 'Seleccione una región'),
-                ('Arica y Parinacota', 'Arica y Parinacota'),
-                ('Tarapacá', 'Tarapacá'),
-                ('Antofagasta', 'Antofagasta'),
-                ('Atacama', 'Atacama'),
-                ('Coquimbo', 'Coquimbo'),
-                ('Valparaíso', 'Valparaíso'),
-                ('Metropolitana', 'Metropolitana'),
-                ('O\'Higgins', 'O\'Higgins'),
-                ('Maule', 'Maule'),
-                ('Ñuble', 'Ñuble'),
-                ('Biobío', 'Biobío'),
-                ('Araucanía', 'Araucanía'),
-                ('Los Ríos', 'Los Ríos'),
-                ('Los Lagos', 'Los Lagos'),
-                ('Aysén', 'Aysén'),
-                ('Magallanes', 'Magallanes'),
-            ]),
-            'comuna': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Comuna'
+                'class': 'form-select',
+                'id': 'id_region'
+            }),
+            'comuna': forms.Select(attrs={
+                'class': 'form-select',
+                'id': 'id_comuna'
             }),
             'mail_contacto': forms.EmailInput(attrs={
                 'class': 'form-control',

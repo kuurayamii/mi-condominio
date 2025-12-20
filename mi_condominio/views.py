@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import models
 from django.db.models import Q
-from .models import Condominio, Reunion, Usuario, Incidencia, CategoriaIncidencia, Bitacora, EvidenciaIncidencia, Amonestacion
+from .models import Condominio, Reunion, Usuario, Incidencia, CategoriaIncidencia, Bitacora, EvidenciaIncidencia, Amonestacion, Region, Comuna
 from django.contrib.auth.models import User
 from .forms import (
     CondominioForm,
@@ -190,6 +190,19 @@ def condominio_delete(request, pk):
     return render(request, 'mi_condominio/condominios/delete.html', {
         'condominio': condominio,
     })
+
+
+def get_comunas_by_region(request, region_id):
+    """
+    API endpoint para obtener las comunas de una región específica.
+    Retorna JSON con las comunas para usar en selección en cascada.
+    """
+    try:
+        comunas = Comuna.objects.filter(region_id=region_id).order_by('nombre')
+        data = [{'id': c.id, 'nombre': c.nombre} for c in comunas]
+        return JsonResponse({'comunas': data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 
 # ============================================================================

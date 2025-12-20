@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import (
+    Region,
+    Comuna,
     Condominio,
     CategoriaIncidencia,
     Reunion,
@@ -13,12 +15,37 @@ from .models import (
 )
 
 
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['codigo', 'nombre', 'numero_romano']
+    search_fields = ['codigo', 'nombre']
+    ordering = ['codigo']
+
+
+@admin.register(Comuna)
+class ComunaAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'region']
+    search_fields = ['nombre', 'region__nombre']
+    list_filter = ['region']
+    ordering = ['region', 'nombre']
+
+
 @admin.register(Condominio)
 class CondominioAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'rut', 'comuna', 'region', 'mail_contacto']
-    search_fields = ['nombre', 'rut', 'comuna']
-    list_filter = ['region', 'comuna']
+    list_display = ['nombre', 'rut', 'get_comuna', 'get_region', 'mail_contacto']
+    search_fields = ['nombre', 'rut', 'comuna__nombre', 'region__nombre']
+    list_filter = ['region', 'comuna__region']
     ordering = ['nombre']
+
+    def get_region(self, obj):
+        return obj.region.nombre if obj.region else '-'
+    get_region.short_description = 'Región'
+    get_region.admin_order_field = 'region__nombre'
+
+    def get_comuna(self, obj):
+        return obj.comuna.nombre if obj.comuna else '-'
+    get_comuna.short_description = 'Comuna'
+    get_comuna.admin_order_field = 'comuna__nombre'
 
 
 @admin.register(CategoriaIncidencia)
