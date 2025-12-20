@@ -6,6 +6,8 @@ en módulos separados para mejor mantenibilidad.
 """
 
 # Importar modelos base
+from .region import Region
+from .comuna import Comuna
 from .condominio import Condominio
 from .usuario import Usuario
 from .reunion import Reunion
@@ -24,6 +26,10 @@ from .chat import ChatSession, ChatMessage
 
 # Definir qué se exporta cuando se hace "from mi_condominio.models import *"
 __all__ = [
+    # Modelos de ubicación
+    'Region',
+    'Comuna',
+
     # Modelos base
     'Condominio',
     'Usuario',

@@ -6,6 +6,8 @@ administradas en el sistema.
 """
 
 from django.db import models
+from .region import Region
+from .comuna import Comuna
 
 
 class Condominio(models.Model):
@@ -38,13 +40,17 @@ class Condominio(models.Model):
         help_text='Dirección completa'
     )
 
-    region = models.CharField(
-        max_length=50,
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+        related_name='condominios',
         help_text='Región donde se ubica'
     )
 
-    comuna = models.CharField(
-        max_length=50,
+    comuna = models.ForeignKey(
+        Comuna,
+        on_delete=models.PROTECT,
+        related_name='condominios',
         help_text='Comuna del condominio'
     )
 
@@ -63,4 +69,4 @@ class Condominio(models.Model):
         ordering = ['nombre']
 
     def __str__(self):
-        return f"{self.nombre} - {self.comuna}"
+        return f"{self.nombre} - {self.comuna.nombre if self.comuna else 'Sin comuna'}"
