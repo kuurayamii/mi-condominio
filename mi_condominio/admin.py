@@ -7,7 +7,9 @@ from .models import (
     Incidencia,
     Bitacora,
     EvidenciaIncidencia,
-    Amonestacion
+    Amonestacion,
+    ChatSession,
+    ChatMessage
 )
 
 
@@ -118,8 +120,8 @@ class BitacoraAdmin(admin.ModelAdmin):
 
 @admin.register(EvidenciaIncidencia)
 class EvidenciaIncidenciaAdmin(admin.ModelAdmin):
-    list_display = ['incidencia', 'tipo_archivo_evidencia', 'url_archivo_evidencia', 'created_at']
-    search_fields = ['incidencia__titulo', 'url_archivo_evidencia']
+    list_display = ['incidencia', 'tipo_archivo_evidencia', 'archivo_evidencia', 'created_at']
+    search_fields = ['incidencia__titulo', 'archivo_evidencia']
     list_filter = ['tipo_archivo_evidencia', 'incidencia']
     ordering = ['-created_at']
 
@@ -128,7 +130,7 @@ class EvidenciaIncidenciaAdmin(admin.ModelAdmin):
             'fields': ('incidencia',)
         }),
         ('Evidencia', {
-            'fields': ('tipo_archivo_evidencia', 'url_archivo_evidencia')
+            'fields': ('tipo_archivo_evidencia', 'archivo_evidencia')
         }),
     )
 
@@ -159,3 +161,36 @@ class AmonestacionAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(ChatSession)
+class ChatSessionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'usuario', 'titulo', 'activa', 'created_at', 'updated_at']
+    search_fields = ['titulo', 'usuario__nombres', 'usuario__apellido']
+    list_filter = ['activa', 'created_at']
+    date_hierarchy = 'created_at'
+    ordering = ['-updated_at']
+
+    readonly_fields = ['created_at', 'updated_at']
+
+
+class ChatMessageInline(admin.TabularInline):
+    model = ChatMessage
+    fields = ['role', 'contenido', 'tokens_usados', 'created_at']
+    readonly_fields = ['created_at']
+    extra = 0
+    can_delete = False
+
+
+@admin.register(ChatMessage)
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'sesion', 'role', 'preview_contenido', 'tokens_usados', 'created_at']
+    search_fields = ['contenido', 'sesion__usuario__nombres']
+    list_filter = ['role', 'created_at']
+    ordering = ['-created_at']
+
+    readonly_fields = ['created_at']
+
+    def preview_contenido(self, obj):
+        return obj.contenido[:100] + "..." if len(obj.contenido) > 100 else obj.contenido
+    preview_contenido.short_description = 'Contenido'
