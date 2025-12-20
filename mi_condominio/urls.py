@@ -56,6 +56,13 @@ urlpatterns = [
     path("amonestaciones/<int:pk>/editar/", views.amonestacion_edit, name="amonestacion_edit"),
     path("amonestaciones/<int:pk>/eliminar/", views.amonestacion_delete, name="amonestacion_delete"),
 
+    # URLs para asistente de IA
+    path("ai-chat/", views.ai_chat_interface, name="ai_chat"),
+    path("ai-chat/send/", views.ai_chat_send_message, name="ai_chat_send"),
+    path("ai-chat/history/", views.ai_chat_history, name="ai_chat_history"),
+    path("ai-chat/clear/", views.ai_chat_clear, name="ai_chat_clear"),
+    path("ai-chat/confirm/", views.ai_chat_confirm_action, name="ai_chat_confirm"),
+
     # TODO: Borrar esta ruta después cuando ya no sea necesaria
     # path("old/", views.index, name="index"),
 ]
