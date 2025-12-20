@@ -29,6 +29,20 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Mostrar errores globales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Errores en el formulario:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
                     <form method="post" novalidate>
                         {% csrf_token %}
 
@@ -39,102 +53,95 @@
                         <div class="row g-3 mb-4">
                             <!-- Nombres -->
                             <div class="col-md-6">
-                                <label for="nombres" class="form-label">
+                                <label for="{{ form.nombres.id_for_label }}" class="form-label">
                                     Nombres <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="nombres"
-                                    name="nombres"
-                                    placeholder="Ej: Juan Carlos"
-                                    value="{% if usuario %}{{ usuario.nombres }}{% endif %}"
-                                    required
-                                    maxlength="200"
-                                >
+                                {{ form.nombres }}
+                                {% if form.nombres.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nombres.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Apellido -->
                             <div class="col-md-6">
-                                <label for="apellido" class="form-label">
+                                <label for="{{ form.apellido.id_for_label }}" class="form-label">
                                     Apellido <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="apellido"
-                                    name="apellido"
-                                    placeholder="Ej: González Pérez"
-                                    value="{% if usuario %}{{ usuario.apellido }}{% endif %}"
-                                    required
-                                    maxlength="200"
-                                >
+                                {{ form.apellido }}
+                                {% if form.apellido.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.apellido.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- RUT -->
                             <div class="col-md-4">
-                                <label for="rut" class="form-label">
+                                <label for="{{ form.rut.id_for_label }}" class="form-label">
                                     RUT <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="rut"
-                                    name="rut"
-                                    placeholder="12345678-9"
-                                    value="{% if usuario %}{{ usuario.rut }}{% endif %}"
-                                    required
-                                    maxlength="10"
-                                >
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.rut.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <div class="form-text">
-                                    Formato sin puntos ni guión
+                                    Formato: XX.XXX.XXX-X
                                 </div>
                             </div>
 
                             <!-- Género -->
                             <div class="col-md-4">
-                                <label for="genero" class="form-label">
+                                <label for="{{ form.genero.id_for_label }}" class="form-label">
                                     Género
                                 </label>
-                                <select class="form-select" id="genero" name="genero">
-                                    <option value="">Seleccione (opcional)</option>
-                                    {% for value, label in generos %}
-                                        <option value="{{ value }}"
-                                            {% if usuario and usuario.genero == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.genero }}
+                                {% if form.genero.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.genero.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Correo -->
                             <div class="col-md-4">
-                                <label for="correo" class="form-label">
+                                <label for="{{ form.correo.id_for_label }}" class="form-label">
                                     Correo Electrónico <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    id="correo"
-                                    name="correo"
-                                    placeholder="usuario@ejemplo.com"
-                                    value="{% if usuario %}{{ usuario.correo }}{% endif %}"
-                                    required
-                                >
+                                {{ form.correo }}
+                                {% if form.correo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.correo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Residencia -->
                             <div class="col-12">
-                                <label for="residencia" class="form-label">
+                                <label for="{{ form.residencia.id_for_label }}" class="form-label">
                                     Dirección de Residencia
                                 </label>
-                                <textarea
-                                    class="form-control"
-                                    id="residencia"
-                                    name="residencia"
-                                    rows="2"
-                                    placeholder="Dirección completa..."
-                                >{% if usuario %}{{ usuario.residencia }}{% endif %}</textarea>
+                                {{ form.residencia }}
+                                {% if form.residencia.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.residencia.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -145,49 +152,47 @@
                         <div class="row g-3 mb-4">
                             <!-- Condominio -->
                             <div class="col-md-4">
-                                <label for="condominio" class="form-label">
+                                <label for="{{ form.condominio.id_for_label }}" class="form-label">
                                     Condominio <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="condominio" name="condominio" required>
-                                    <option value="">Seleccione un condominio</option>
-                                    {% for condo in condominios %}
-                                        <option value="{{ condo.pk }}"
-                                            {% if usuario and usuario.condominio.pk == condo.pk %}selected{% endif %}>
-                                            {{ condo.nombre }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.condominio }}
+                                {% if form.condominio.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.condominio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Tipo de Usuario -->
                             <div class="col-md-4">
-                                <label for="tipo_usuario" class="form-label">
+                                <label for="{{ form.tipo_usuario.id_for_label }}" class="form-label">
                                     Tipo de Usuario <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="tipo_usuario" name="tipo_usuario" required>
-                                    <option value="">Seleccione un tipo</option>
-                                    {% for value, label in tipos_usuario %}
-                                        <option value="{{ value }}"
-                                            {% if usuario and usuario.tipo_usuario == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.tipo_usuario }}
+                                {% if form.tipo_usuario.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo_usuario.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Estado de Cuenta -->
                             <div class="col-md-4">
-                                <label for="estado_cuenta" class="form-label">
+                                <label for="{{ form.estado_cuenta.id_for_label }}" class="form-label">
                                     Estado de Cuenta <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="estado_cuenta" name="estado_cuenta" required>
-                                    {% for value, label in estados_cuenta %}
-                                        <option value="{{ value }}"
-                                            {% if usuario and usuario.estado_cuenta == value %}selected{% elif not usuario and value == "ACTIVO" %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.estado_cuenta }}
+                                {% if form.estado_cuenta.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.estado_cuenta.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -196,7 +201,7 @@
                             <i class="bi bi-key me-2"></i>Credenciales de Acceso
                         </h6>
                         <div class="row g-3">
-                            <!-- Nombre de Usuario -->
+                            <!-- Nombre de Usuario (campo manual - NO está en el form) -->
                             {% if not usuario %}
                             <div class="col-md-6">
                                 <label for="username" class="form-label">
@@ -232,7 +237,7 @@
                             </div>
                             {% endif %}
 
-                            <!-- Contraseña -->
+                            <!-- Contraseña (campo manual - NO está en el form) -->
                             <div class="col-md-6">
                                 <label for="password" class="form-label">
                                     Contraseña {% if not usuario %}<span class="text-danger">*</span>{% endif %}

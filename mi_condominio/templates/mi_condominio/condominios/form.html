@@ -29,121 +29,115 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Mostrar errores globales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Errores en el formulario:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
                     <form method="post" novalidate>
                         {% csrf_token %}
 
                         <div class="row g-3">
                             <!-- RUT -->
                             <div class="col-md-6">
-                                <label for="rut" class="form-label">
+                                <label for="{{ form.rut.id_for_label }}" class="form-label">
                                     RUT <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="rut"
-                                    name="rut"
-                                    placeholder="12.345.678-9"
-                                    value="{% if condominio %}{{ condominio.rut }}{% endif %}"
-                                    required
-                                    maxlength="10"
-                                >
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.rut.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <div class="form-text">
-                                    Formato sin puntos ni guión (ej: 123456789)
+                                    Formato: XX.XXX.XXX-X
                                 </div>
                             </div>
 
                             <!-- Email de contacto -->
                             <div class="col-md-6">
-                                <label for="mail_contacto" class="form-label">
+                                <label for="{{ form.mail_contacto.id_for_label }}" class="form-label">
                                     Email de Contacto <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    id="mail_contacto"
-                                    name="mail_contacto"
-                                    placeholder="contacto@condominio.cl"
-                                    value="{% if condominio %}{{ condominio.mail_contacto }}{% endif %}"
-                                    required
-                                >
+                                {{ form.mail_contacto }}
+                                {% if form.mail_contacto.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.mail_contacto.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Nombre -->
                             <div class="col-12">
-                                <label for="nombre" class="form-label">
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">
                                     Nombre del Condominio <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="nombre"
-                                    name="nombre"
-                                    placeholder="Ej: Condominio Los Robles"
-                                    value="{% if condominio %}{{ condominio.nombre }}{% endif %}"
-                                    required
-                                    maxlength="140"
-                                >
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nombre.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Dirección -->
                             <div class="col-12">
-                                <label for="direccion" class="form-label">
+                                <label for="{{ form.direccion.id_for_label }}" class="form-label">
                                     Dirección <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="direccion"
-                                    name="direccion"
-                                    placeholder="Ej: Av. Libertador Bernardo O'Higgins 123"
-                                    value="{% if condominio %}{{ condominio.direccion }}{% endif %}"
-                                    required
-                                    maxlength="255"
-                                >
+                                {{ form.direccion }}
+                                {% if form.direccion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.direccion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Región -->
                             <div class="col-md-6">
-                                <label for="region" class="form-label">
+                                <label for="{{ form.region.id_for_label }}" class="form-label">
                                     Región <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="region" name="region" required>
-                                    <option value="">Seleccione una región</option>
-                                    <option value="Región de Arica y Parinacota" {% if condominio and condominio.region == "Región de Arica y Parinacota" %}selected{% endif %}>Región de Arica y Parinacota</option>
-                                    <option value="Región de Tarapacá" {% if condominio and condominio.region == "Región de Tarapacá" %}selected{% endif %}>Región de Tarapacá</option>
-                                    <option value="Región de Antofagasta" {% if condominio and condominio.region == "Región de Antofagasta" %}selected{% endif %}>Región de Antofagasta</option>
-                                    <option value="Región de Atacama" {% if condominio and condominio.region == "Región de Atacama" %}selected{% endif %}>Región de Atacama</option>
-                                    <option value="Región de Coquimbo" {% if condominio and condominio.region == "Región de Coquimbo" %}selected{% endif %}>Región de Coquimbo</option>
-                                    <option value="Región de Valparaíso" {% if condominio and condominio.region == "Región de Valparaíso" %}selected{% endif %}>Región de Valparaíso</option>
-                                    <option value="Región Metropolitana" {% if condominio and condominio.region == "Región Metropolitana" %}selected{% endif %}>Región Metropolitana</option>
-                                    <option value="Región del Libertador General Bernardo O'Higgins" {% if condominio and condominio.region == "Región del Libertador General Bernardo O'Higgins" %}selected{% endif %}>Región del Libertador General Bernardo O'Higgins</option>
-                                    <option value="Región del Maule" {% if condominio and condominio.region == "Región del Maule" %}selected{% endif %}>Región del Maule</option>
-                                    <option value="Región de Ñuble" {% if condominio and condominio.region == "Región de Ñuble" %}selected{% endif %}>Región de Ñuble</option>
-                                    <option value="Región del Biobío" {% if condominio and condominio.region == "Región del Biobío" %}selected{% endif %}>Región del Biobío</option>
-                                    <option value="Región de La Araucanía" {% if condominio and condominio.region == "Región de La Araucanía" %}selected{% endif %}>Región de La Araucanía</option>
-                                    <option value="Región de Los Ríos" {% if condominio and condominio.region == "Región de Los Ríos" %}selected{% endif %}>Región de Los Ríos</option>
-                                    <option value="Región de Los Lagos" {% if condominio and condominio.region == "Región de Los Lagos" %}selected{% endif %}>Región de Los Lagos</option>
-                                    <option value="Región de Aysén" {% if condominio and condominio.region == "Región de Aysén" %}selected{% endif %}>Región de Aysén</option>
-                                    <option value="Región de Magallanes" {% if condominio and condominio.region == "Región de Magallanes" %}selected{% endif %}>Región de Magallanes</option>
-                                </select>
+                                {{ form.region }}
+                                {% if form.region.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.region.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Comuna -->
                             <div class="col-md-6">
-                                <label for="comuna" class="form-label">
+                                <label for="{{ form.comuna.id_for_label }}" class="form-label">
                                     Comuna <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="comuna"
-                                    name="comuna"
-                                    placeholder="Ej: Santiago"
-                                    value="{% if condominio %}{{ condominio.comuna }}{% endif %}"
-                                    required
-                                    maxlength="50"
-                                >
+                                {{ form.comuna }}
+                                {% if form.comuna.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.comuna.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 

@@ -1,11 +1,11 @@
 {% extends 'mi_condominio/dashboard/base_dashboard.html' %}
 
-{% block title %}{% if is_edit %}Editar Evidencia{% else %}Agregar Evidencia{% endif %}{% endblock %}
+{% block title %}{{ action }} Evidencia{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{% if is_edit %}Editar Evidencia{% else %}Agregar Nueva Evidencia{% endif %}</h2>
+        <h2>{{ action }} Evidencia</h2>
         <a href="{% url 'evidencia_list' %}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i>Volver a la lista
         </a>
@@ -15,53 +15,88 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post">
+                    <!-- Mostrar errores globales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Errores en el formulario:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
 
                         <!-- Incidencia -->
                         <div class="mb-3">
-                            <label for="incidencia" class="form-label">Incidencia <span class="text-danger">*</span></label>
-                            <select name="incidencia" id="incidencia" class="form-select" required>
-                                <option value="">Seleccione una incidencia</option>
-                                {% for incidencia in incidencias %}
-                                    <option value="{{ incidencia.id }}"
-                                            {% if is_edit and evidencia.incidencia.id == incidencia.id %}selected{% endif %}>
-                                        {{ incidencia.titulo_incidencia }} - {{ incidencia.condominio.nombre_condominio }}
-                                        ({{ incidencia.get_estado_display }})
-                                    </option>
-                                {% endfor %}
-                            </select>
+                            <label for="{{ form.incidencia.id_for_label }}" class="form-label">
+                                Incidencia <span class="text-danger">*</span>
+                            </label>
+                            {{ form.incidencia }}
+                            {% if form.incidencia.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.incidencia.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                             <small class="form-text text-muted">Seleccione la incidencia a la que pertenece esta evidencia</small>
                         </div>
 
-                        <!-- URL del Archivo -->
+                        <!-- Archivo de Evidencia -->
                         <div class="mb-3">
-                            <label for="url_archivo_evidencia" class="form-label">URL del Archivo <span class="text-danger">*</span></label>
-                            <input type="url"
-                                   name="url_archivo_evidencia"
-                                   id="url_archivo_evidencia"
-                                   class="form-control"
-                                   value="{% if is_edit %}{{ evidencia.url_archivo_evidencia }}{% endif %}"
-                                   placeholder="https://ejemplo.com/archivo.jpg"
-                                   required>
+                            <label for="{{ form.archivo_evidencia.id_for_label }}" class="form-label">
+                                Archivo de Evidencia <span class="text-danger">*</span>
+                            </label>
+                            {{ form.archivo_evidencia }}
+                            {% if form.archivo_evidencia.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.archivo_evidencia.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                             <small class="form-text text-muted">
-                                URL completa del archivo de evidencia (imagen, video, documento, etc.)
+                                Seleccione el archivo a subir (máximo 50MB). Formatos soportados: imágenes, videos, documentos, audio.
                             </small>
+
+                            <!-- Mostrar archivo actual si estamos editando -->
+                            {% if evidencia and evidencia.archivo_evidencia %}
+                                <div class="mt-2 p-2 bg-light border rounded">
+                                    <small class="text-muted">
+                                        <i class="bi bi-file-earmark-check me-1"></i>
+                                        <strong>Archivo actual:</strong> {{ evidencia.nombre_archivo }}
+                                    </small>
+                                    {% if evidencia.es_imagen %}
+                                        <div class="mt-2">
+                                            <img src="{{ evidencia.archivo_evidencia.url }}" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </div>
 
                         <!-- Tipo de Archivo -->
                         <div class="mb-3">
-                            <label for="tipo_archivo_evidencia" class="form-label">Tipo de Archivo <span class="text-danger">*</span></label>
-                            <select name="tipo_archivo_evidencia" id="tipo_archivo_evidencia" class="form-select" required>
-                                <option value="">Seleccione el tipo de archivo</option>
-                                {% for codigo, nombre in tipos_archivo %}
-                                    <option value="{{ codigo }}"
-                                            {% if is_edit and evidencia.tipo_archivo_evidencia == codigo %}selected{% endif %}>
-                                        {{ nombre }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <small class="form-text text-muted">Tipo de archivo que está adjuntando como evidencia</small>
+                            <label for="{{ form.tipo_archivo_evidencia.id_for_label }}" class="form-label">
+                                Tipo de Archivo <span class="text-danger">*</span>
+                            </label>
+                            {{ form.tipo_archivo_evidencia }}
+                            {% if form.tipo_archivo_evidencia.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.tipo_archivo_evidencia.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                El tipo se puede autodetectar automáticamente según la extensión del archivo
+                            </small>
                         </div>
 
                         <hr class="my-4">
@@ -71,8 +106,7 @@
                                 <i class="bi bi-x-circle me-2"></i>Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle me-2"></i>
-                                {% if is_edit %}Actualizar Evidencia{% else %}Agregar Evidencia{% endif %}
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Evidencia
                             </button>
                         </div>
                     </form>
@@ -92,16 +126,20 @@
                     <hr>
                     <h6>Tipos de Archivo Soportados:</h6>
                     <ul class="small">
-                        <li><i class="bi bi-image text-primary"></i> <strong>Imagen:</strong> JPG, PNG, GIF, etc.</li>
-                        <li><i class="bi bi-camera-video text-danger"></i> <strong>Video:</strong> MP4, AVI, MOV, etc.</li>
-                        <li><i class="bi bi-file-earmark-text text-info"></i> <strong>Documento:</strong> PDF, DOC, TXT, etc.</li>
-                        <li><i class="bi bi-mic text-warning"></i> <strong>Audio:</strong> MP3, WAV, AAC, etc.</li>
+                        <li><i class="bi bi-image text-primary"></i> <strong>Imagen:</strong> JPG, PNG, GIF, BMP, WebP</li>
+                        <li><i class="bi bi-camera-video text-danger"></i> <strong>Video:</strong> MP4, AVI, MOV, WebM, MKV</li>
+                        <li><i class="bi bi-file-earmark-text text-info"></i> <strong>Documento:</strong> PDF, DOC, DOCX, XLS, XLSX, TXT</li>
+                        <li><i class="bi bi-mic text-warning"></i> <strong>Audio:</strong> MP3, WAV, OGG, M4A, AAC</li>
                         <li><i class="bi bi-file-earmark text-secondary"></i> <strong>Otro:</strong> Cualquier otro formato</li>
                     </ul>
                     <hr>
                     <p class="small text-muted mb-0">
                         <i class="bi bi-exclamation-triangle me-1"></i>
-                        Asegúrese de que la URL del archivo sea accesible y esté correctamente formateada.
+                        <strong>Tamaño máximo:</strong> 50MB por archivo
+                    </p>
+                    <p class="small text-muted mb-0 mt-2">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Los archivos se almacenan localmente en el servidor
                     </p>
                 </div>
             </div>

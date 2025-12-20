@@ -1,11 +1,11 @@
 {% extends 'mi_condominio/dashboard/base_dashboard.html' %}
 
-{% block title %}{% if is_edit %}Editar Amonestación{% else %}Registrar Amonestación{% endif %}{% endblock %}
+{% block title %}{{ action }} Amonestación{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{% if is_edit %}Editar Amonestación{% else %}Registrar Nueva Amonestación{% endif %}</h2>
+        <h2>{{ action }} Amonestación</h2>
         <a href="{% url 'amonestacion_list' %}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i>Volver a la lista
         </a>
@@ -15,7 +15,21 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post">
+                    <!-- Mostrar errores globales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Errores en el formulario:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
                         {% csrf_token %}
 
                         <!-- Información del Amonestado -->
@@ -23,46 +37,62 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="nombre_amonestado" class="form-label">Nombre <span class="text-danger">*</span></label>
-                                <input type="text"
-                                       name="nombre_amonestado"
-                                       id="nombre_amonestado"
-                                       class="form-control"
-                                       value="{% if is_edit %}{{ amonestacion.nombre_amonestado }}{% endif %}"
-                                       required>
+                                <label for="{{ form.nombre_amonestado.id_for_label }}" class="form-label">
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                {{ form.nombre_amonestado }}
+                                {% if form.nombre_amonestado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nombre_amonestado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="apellidos_amonestado" class="form-label">Apellidos <span class="text-danger">*</span></label>
-                                <input type="text"
-                                       name="apellidos_amonestado"
-                                       id="apellidos_amonestado"
-                                       class="form-control"
-                                       value="{% if is_edit %}{{ amonestacion.apellidos_amonestado }}{% endif %}"
-                                       required>
+                                <label for="{{ form.apellidos_amonestado.id_for_label }}" class="form-label">
+                                    Apellidos <span class="text-danger">*</span>
+                                </label>
+                                {{ form.apellidos_amonestado }}
+                                {% if form.apellidos_amonestado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.apellidos_amonestado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="rut_amonestado" class="form-label">RUT <span class="text-danger">*</span></label>
-                                <input type="text"
-                                       name="rut_amonestado"
-                                       id="rut_amonestado"
-                                       class="form-control"
-                                       placeholder="12.345.678-9"
-                                       value="{% if is_edit %}{{ amonestacion.rut_amonestado }}{% endif %}"
-                                       required>
+                                <label for="{{ form.rut_amonestado.id_for_label }}" class="form-label">
+                                    RUT <span class="text-danger">*</span>
+                                </label>
+                                {{ form.rut_amonestado }}
+                                {% if form.rut_amonestado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.rut_amonestado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Formato: XX.XXX.XXX-X</small>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="numero_departamento" class="form-label">Número de Departamento</label>
-                                <input type="text"
-                                       name="numero_departamento"
-                                       id="numero_departamento"
-                                       class="form-control"
-                                       placeholder="101, 202, etc."
-                                       value="{% if is_edit %}{{ amonestacion.numero_departamento }}{% endif %}">
+                                <label for="{{ form.numero_departamento.id_for_label }}" class="form-label">
+                                    Número de Departamento
+                                </label>
+                                {{ form.numero_departamento }}
+                                {% if form.numero_departamento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.numero_departamento.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -73,49 +103,58 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="tipo_amonestacion" class="form-label">Tipo de Amonestación <span class="text-danger">*</span></label>
-                                <select name="tipo_amonestacion" id="tipo_amonestacion" class="form-select" required>
-                                    <option value="">Seleccione el tipo</option>
-                                    {% for codigo, nombre in tipos_amonestacion %}
-                                        <option value="{{ codigo }}"
-                                                {% if is_edit and amonestacion.tipo_amonestacion == codigo %}selected{% endif %}>
-                                            {{ nombre }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                <label for="{{ form.tipo_amonestacion.id_for_label }}" class="form-label">
+                                    Tipo de Amonestación <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_amonestacion }}
+                                {% if form.tipo_amonestacion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo_amonestacion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="fecha_amonestacion" class="form-label">Fecha <span class="text-danger">*</span></label>
-                                <input type="date"
-                                       name="fecha_amonestacion"
-                                       id="fecha_amonestacion"
-                                       class="form-control"
-                                       value="{% if is_edit %}{{ amonestacion.fecha_amonestacion|date:'Y-m-d' }}{% endif %}"
-                                       required>
+                                <label for="{{ form.fecha_amonestacion.id_for_label }}" class="form-label">
+                                    Fecha <span class="text-danger">*</span>
+                                </label>
+                                {{ form.fecha_amonestacion }}
+                                {% if form.fecha_amonestacion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.fecha_amonestacion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="motivo_amonestacion" class="form-label">Motivo <span class="text-danger">*</span></label>
-                            <select name="motivo_amonestacion" id="motivo_amonestacion" class="form-select" required>
-                                <option value="">Seleccione el motivo</option>
-                                {% for codigo, nombre in motivos %}
-                                    <option value="{{ codigo }}"
-                                            {% if is_edit and amonestacion.motivo == codigo %}selected{% endif %}>
-                                        {{ nombre }}
-                                    </option>
-                                {% endfor %}
-                            </select>
+                            <label for="{{ form.motivo.id_for_label }}" class="form-label">
+                                Motivo <span class="text-danger">*</span>
+                            </label>
+                            {{ form.motivo }}
+                            {% if form.motivo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.motivo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="motivo_detalle" class="form-label">Detalle del Motivo</label>
-                            <textarea name="motivo_detalle"
-                                      id="motivo_detalle"
-                                      class="form-control"
-                                      rows="3"
-                                      placeholder="Describa detalladamente la situación que originó la amonestación...">{% if is_edit %}{{ amonestacion.motivo_detalle }}{% endif %}</textarea>
+                            <label for="{{ form.motivo_detalle.id_for_label }}" class="form-label">Detalle del Motivo</label>
+                            {{ form.motivo_detalle }}
+                            {% if form.motivo_detalle.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.motivo_detalle.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                             <small class="form-text text-muted">
                                 Proporcione una descripción clara y detallada de la amonestación. Especialmente importante si seleccionó "Otro motivo".
                             </small>
@@ -123,25 +162,31 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="usuario_reporta" class="form-label">Usuario que Reporta <span class="text-danger">*</span></label>
-                                <select name="usuario_reporta" id="usuario_reporta" class="form-select" required>
-                                    <option value="">Seleccione un usuario</option>
-                                    {% for usuario in usuarios %}
-                                        <option value="{{ usuario.id }}"
-                                                {% if is_edit and amonestacion.usuario_reporta.id == usuario.id %}selected{% endif %}>
-                                            {{ usuario.apellido }}, {{ usuario.nombres }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                <label for="{{ form.usuario_reporta.id_for_label }}" class="form-label">
+                                    Usuario que Reporta <span class="text-danger">*</span>
+                                </label>
+                                {{ form.usuario_reporta }}
+                                {% if form.usuario_reporta.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.usuario_reporta.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
-                            <div class="col-md-6 mb-3" id="fecha_limite_pago_container" style="display: none;">
-                                <label for="fecha_limite_pago" class="form-label">Fecha Límite de Pago</label>
-                                <input type="date"
-                                       name="fecha_limite_pago"
-                                       id="fecha_limite_pago"
-                                       class="form-control"
-                                       value="{% if is_edit %}{{ amonestacion.fecha_limite_pago|date:'Y-m-d' }}{% endif %}">
+                            <div class="col-md-6 mb-3" id="fecha_limite_pago_container">
+                                <label for="{{ form.fecha_limite_pago.id_for_label }}" class="form-label">
+                                    Fecha Límite de Pago
+                                </label>
+                                {{ form.fecha_limite_pago }}
+                                {% if form.fecha_limite_pago.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.fecha_limite_pago.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <small class="form-text text-muted">Solo para multas</small>
                             </div>
                         </div>
@@ -153,8 +198,7 @@
                                 <i class="bi bi-x-circle me-2"></i>Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle me-2"></i>
-                                {% if is_edit %}Actualizar Amonestación{% else %}Registrar Amonestación{% endif %}
+                                <i class="bi bi-check-circle me-2"></i>{{ action }} Amonestación
                             </button>
                         </div>
                     </form>
@@ -202,25 +246,25 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const tipoAmonestacion = document.getElementById('tipo_amonestacion');
+    const tipoAmonestacion = document.getElementById('id_tipo_amonestacion');
     const fechaLimitePagoContainer = document.getElementById('fecha_limite_pago_container');
-    const fechaLimitePagoInput = document.getElementById('fecha_limite_pago');
+    const fechaLimitePagoInput = document.getElementById('id_fecha_limite_pago');
 
-    function toggleFechaLimitePago() {
-        if (tipoAmonestacion.value === 'MULTA') {
-            fechaLimitePagoContainer.style.display = 'block';
-            fechaLimitePagoInput.required = true;
-        } else {
-            fechaLimitePagoContainer.style.display = 'none';
-            fechaLimitePagoInput.required = false;
-            fechaLimitePagoInput.value = '';
+    if (tipoAmonestacion && fechaLimitePagoContainer && fechaLimitePagoInput) {
+        function toggleFechaLimitePago() {
+            if (tipoAmonestacion.value === 'MULTA') {
+                fechaLimitePagoContainer.style.display = 'block';
+            } else {
+                fechaLimitePagoContainer.style.display = 'none';
+                fechaLimitePagoInput.value = '';
+            }
         }
+
+        tipoAmonestacion.addEventListener('change', toggleFechaLimitePago);
+
+        // Check on page load in case of edit mode
+        toggleFechaLimitePago();
     }
-
-    tipoAmonestacion.addEventListener('change', toggleFechaLimitePago);
-
-    // Check on page load in case of edit mode
-    toggleFechaLimitePago();
 });
 </script>
 {% endblock %}

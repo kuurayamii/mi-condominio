@@ -21,7 +21,7 @@
                         <option value="">Todas las incidencias</option>
                         {% for incidencia in incidencias %}
                             <option value="{{ incidencia.id }}" {% if request.GET.incidencia == incidencia.id|stringformat:"s" %}selected{% endif %}>
-                                {{ incidencia.titulo_incidencia }} ({{ incidencia.condominio.nombre_condominio }})
+                                {{ incidencia.titulo }} ({{ incidencia.condominio.nombre }})
                             </option>
                         {% endfor %}
                     </select>
@@ -40,7 +40,7 @@
                 <div class="col-md-3">
                     <label for="search" class="form-label">Buscar</label>
                     <input type="text" name="search" id="search" class="form-control"
-                           placeholder="Buscar por título o URL..." value="{{ request.GET.search }}">
+                           placeholder="Buscar por título o archivo..." value="{{ request.GET.search }}">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100 me-2">
@@ -59,33 +59,69 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th style="width: 60px;">ID</th>
+                                <th>Preview</th>
                                 <th>Incidencia</th>
                                 <th>Condominio</th>
-                                <th>Tipo de Archivo</th>
-                                <th>URL del Archivo</th>
-                                <th>Acciones</th>
+                                <th>Tipo</th>
+                                <th>Archivo</th>
+                                <th style="width: 120px;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for evidencia in evidencias %}
                                 <tr>
                                     <td>{{ evidencia.id }}</td>
+                                    <td style="width: 100px;">
+                                        {% if evidencia.es_imagen %}
+                                            <!-- Preview de imagen -->
+                                            <a href="{{ evidencia.archivo_evidencia.url }}" target="_blank" data-bs-toggle="tooltip" title="Click para ver tamaño completo">
+                                                <img src="{{ evidencia.archivo_evidencia.url }}"
+                                                     alt="Preview"
+                                                     class="img-thumbnail"
+                                                     style="max-height: 60px; max-width: 80px; cursor: pointer;">
+                                            </a>
+                                        {% elif evidencia.es_video %}
+                                            <!-- Icono de video -->
+                                            <div class="text-center">
+                                                <i class="bi bi-play-circle-fill text-danger" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                        {% elif evidencia.tipo_archivo_evidencia == 'DOCUMENTO' %}
+                                            <!-- Icono de documento -->
+                                            <div class="text-center">
+                                                <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                        {% elif evidencia.tipo_archivo_evidencia == 'AUDIO' %}
+                                            <!-- Icono de audio -->
+                                            <div class="text-center">
+                                                <i class="bi bi-file-earmark-music-fill text-primary" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                        {% else %}
+                                            <!-- Icono genérico -->
+                                            <div class="text-center">
+                                                <i class="bi bi-file-earmark-fill text-secondary" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                    </td>
                                     <td>
-                                        <strong>{{ evidencia.incidencia.titulo_incidencia }}</strong><br>
+                                        <strong>{{ evidencia.incidencia.titulo }}</strong><br>
                                         <small class="text-muted">
-                                            {% if evidencia.incidencia.estado == 'ABIERTA' %}
-                                                <span class="badge bg-success">Abierta</span>
+                                            {% if evidencia.incidencia.estado == 'PENDIENTE' %}
+                                                <span class="badge bg-warning">Pendiente</span>
                                             {% elif evidencia.incidencia.estado == 'EN_PROCESO' %}
-                                                <span class="badge bg-warning">En Proceso</span>
+                                                <span class="badge bg-info">En Proceso</span>
+                                            {% elif evidencia.incidencia.estado == 'RESUELTA' %}
+                                                <span class="badge bg-success">Resuelta</span>
                                             {% elif evidencia.incidencia.estado == 'CERRADA' %}
                                                 <span class="badge bg-secondary">Cerrada</span>
+                                            {% elif evidencia.incidencia.estado == 'CANCELADA' %}
+                                                <span class="badge bg-danger">Cancelada</span>
                                             {% else %}
-                                                <span class="badge bg-danger">{{ evidencia.incidencia.get_estado_display }}</span>
+                                                <span class="badge bg-dark">{{ evidencia.incidencia.get_estado_display }}</span>
                                             {% endif %}
                                         </small>
                                     </td>
-                                    <td>{{ evidencia.incidencia.condominio.nombre_condominio }}</td>
+                                    <td>{{ evidencia.incidencia.condominio.nombre }}</td>
                                     <td>
                                         {% if evidencia.tipo_archivo_evidencia == 'IMAGEN' %}
                                             <i class="bi bi-image text-primary"></i> {{ evidencia.get_tipo_archivo_evidencia_display }}
@@ -100,17 +136,22 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ evidencia.url_archivo_evidencia }}" target="_blank" class="text-decoration-none">
-                                            <i class="bi bi-link-45deg"></i> Ver archivo
-                                        </a>
+                                        <div class="d-flex flex-column gap-1">
+                                            <a href="{{ evidencia.archivo_evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                <i class="bi bi-download"></i> Descargar
+                                            </a>
+                                            <small class="text-muted text-truncate" style="max-width: 150px;" title="{{ evidencia.nombre_archivo }}">
+                                                {{ evidencia.nombre_archivo }}
+                                            </small>
+                                        </div>
                                     </td>
                                     <td>
-                                        <div class="btn-group" role="group">
+                                        <div class="btn-group-vertical w-100" role="group">
                                             <a href="{% url 'evidencia_edit' evidencia.id %}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-pencil"></i>
+                                                <i class="bi bi-pencil"></i> Editar
                                             </a>
                                             <a href="{% url 'evidencia_delete' evidencia.id %}" class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i>
+                                                <i class="bi bi-trash"></i> Eliminar
                                             </a>
                                         </div>
                                     </td>

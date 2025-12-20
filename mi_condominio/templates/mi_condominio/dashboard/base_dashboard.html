@@ -99,6 +99,15 @@
                         </a>
                         {% endif %}
                     </div>
+
+                    <!-- Asistente IA -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Asistente IA</div>
+                        <a href="{% url 'ai_chat' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_chat' %}active{% endif %}">
+                            <i class="bi bi-robot"></i>
+                            <span>Chat con IA</span>
+                        </a>
+                    </div>
                 </nav>
             </div>
 

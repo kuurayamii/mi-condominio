@@ -29,57 +29,67 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Mostrar errores globales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Errores en el formulario:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
                     <form method="post" novalidate>
                         {% csrf_token %}
 
                         <div class="row g-3">
                             <!-- Condominio -->
                             <div class="col-md-6">
-                                <label for="condominio" class="form-label">
+                                <label for="{{ form.condominio.id_for_label }}" class="form-label">
                                     Condominio <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="condominio" name="condominio" required>
-                                    <option value="">Seleccione un condominio</option>
-                                    {% for condo in condominios %}
-                                        <option value="{{ condo.pk }}"
-                                            {% if reunion and reunion.condominio.pk == condo.pk %}selected{% endif %}>
-                                            {{ condo.nombre }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.condominio }}
+                                {% if form.condominio.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.condominio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Tipo de Reunión -->
                             <div class="col-md-6">
-                                <label for="tipo_reunion" class="form-label">
+                                <label for="{{ form.tipo_reunion.id_for_label }}" class="form-label">
                                     Tipo de Reunión <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select" id="tipo_reunion" name="tipo_reunion" required>
-                                    <option value="">Seleccione un tipo</option>
-                                    {% for value, label in tipos_reunion %}
-                                        <option value="{{ value }}"
-                                            {% if reunion and reunion.tipo_reunion == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.tipo_reunion }}
+                                {% if form.tipo_reunion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo_reunion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Nombre de la Reunión -->
                             <div class="col-md-8">
-                                <label for="nombre_reunion" class="form-label">
+                                <label for="{{ form.nombre_reunion.id_for_label }}" class="form-label">
                                     Nombre de la Reunión <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="nombre_reunion"
-                                    name="nombre_reunion"
-                                    placeholder="Ej: Asamblea General"
-                                    value="{% if reunion %}{{ reunion.nombre_reunion }}{% endif %}"
-                                    required
-                                    maxlength="20"
-                                >
+                                {{ form.nombre_reunion }}
+                                {% if form.nombre_reunion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nombre_reunion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <div class="form-text">
                                     Máximo 20 caracteres
                                 </div>
@@ -87,62 +97,62 @@
 
                             <!-- Fecha de la Reunión -->
                             <div class="col-md-4">
-                                <label for="fecha_reunion" class="form-label">
+                                <label for="{{ form.fecha_reunion.id_for_label }}" class="form-label">
                                     Fecha <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    id="fecha_reunion"
-                                    name="fecha_reunion"
-                                    value="{% if reunion %}{{ reunion.fecha_reunion|date:'Y-m-d' }}{% endif %}"
-                                    required
-                                >
+                                {{ form.fecha_reunion }}
+                                {% if form.fecha_reunion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.fecha_reunion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Lugar de la Reunión -->
                             <div class="col-12">
-                                <label for="lugar_reunion" class="form-label">
+                                <label for="{{ form.lugar_reunion.id_for_label }}" class="form-label">
                                     Lugar de la Reunión
                                 </label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="lugar_reunion"
-                                    name="lugar_reunion"
-                                    placeholder="Ej: Salón de eventos del condominio"
-                                    value="{% if reunion %}{{ reunion.lugar_reunion }}{% endif %}"
-                                    maxlength="60"
-                                >
+                                {{ form.lugar_reunion }}
+                                {% if form.lugar_reunion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.lugar_reunion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- Motivo de la Reunión -->
                             <div class="col-12">
-                                <label for="motivo_reunion" class="form-label">
+                                <label for="{{ form.motivo_reunion.id_for_label }}" class="form-label">
                                     Motivo o Temática
                                 </label>
-                                <textarea
-                                    class="form-control"
-                                    id="motivo_reunion"
-                                    name="motivo_reunion"
-                                    rows="4"
-                                    placeholder="Describe los temas a tratar en la reunión..."
-                                >{% if reunion %}{{ reunion.motivo_reunion }}{% endif %}</textarea>
+                                {{ form.motivo_reunion }}
+                                {% if form.motivo_reunion.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.motivo_reunion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <!-- URL del Acta -->
                             <div class="col-12">
-                                <label for="acta_reunion_url" class="form-label">
+                                <label for="{{ form.acta_reunion_url.id_for_label }}" class="form-label">
                                     URL del Acta
                                 </label>
-                                <input
-                                    type="url"
-                                    class="form-control"
-                                    id="acta_reunion_url"
-                                    name="acta_reunion_url"
-                                    placeholder="https://ejemplo.com/acta.pdf"
-                                    value="{% if reunion %}{{ reunion.acta_reunion_url }}{% endif %}"
-                                >
+                                {{ form.acta_reunion_url }}
+                                {% if form.acta_reunion_url.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.acta_reunion_url.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <div class="form-text">
                                     URL donde se encuentra el acta de la reunión (Google Drive, Dropbox, etc.)
                                 </div>
