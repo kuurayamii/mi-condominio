@@ -73,33 +73,40 @@
                                 <tr>
                                     <td>{{ evidencia.id }}</td>
                                     <td style="width: 100px;">
-                                        {% if evidencia.es_imagen %}
-                                            <!-- Preview de imagen -->
-                                            <a href="{{ evidencia.archivo_evidencia.url }}" target="_blank" data-bs-toggle="tooltip" title="Click para ver tamaño completo">
-                                                <img src="{{ evidencia.archivo_evidencia.url }}"
-                                                     alt="Preview"
-                                                     class="img-thumbnail"
-                                                     style="max-height: 60px; max-width: 80px; cursor: pointer;">
-                                            </a>
-                                        {% elif evidencia.es_video %}
-                                            <!-- Icono de video -->
-                                            <div class="text-center">
-                                                <i class="bi bi-play-circle-fill text-danger" style="font-size: 2.5rem;"></i>
-                                            </div>
-                                        {% elif evidencia.tipo_archivo_evidencia == 'DOCUMENTO' %}
-                                            <!-- Icono de documento -->
-                                            <div class="text-center">
-                                                <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 2.5rem;"></i>
-                                            </div>
-                                        {% elif evidencia.tipo_archivo_evidencia == 'AUDIO' %}
-                                            <!-- Icono de audio -->
-                                            <div class="text-center">
-                                                <i class="bi bi-file-earmark-music-fill text-primary" style="font-size: 2.5rem;"></i>
-                                            </div>
+                                        {% if evidencia.archivo_evidencia %}
+                                            {% if evidencia.es_imagen %}
+                                                <!-- Preview de imagen -->
+                                                <a href="{{ evidencia.archivo_evidencia.url }}" target="_blank" data-bs-toggle="tooltip" title="Click para ver tamaño completo">
+                                                    <img src="{{ evidencia.archivo_evidencia.url }}"
+                                                         alt="Preview"
+                                                         class="img-thumbnail"
+                                                         style="max-height: 60px; max-width: 80px; cursor: pointer;">
+                                                </a>
+                                            {% elif evidencia.es_video %}
+                                                <!-- Icono de video -->
+                                                <div class="text-center">
+                                                    <i class="bi bi-play-circle-fill text-danger" style="font-size: 2.5rem;"></i>
+                                                </div>
+                                            {% elif evidencia.tipo_archivo_evidencia == 'DOCUMENTO' %}
+                                                <!-- Icono de documento -->
+                                                <div class="text-center">
+                                                    <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 2.5rem;"></i>
+                                                </div>
+                                            {% elif evidencia.tipo_archivo_evidencia == 'AUDIO' %}
+                                                <!-- Icono de audio -->
+                                                <div class="text-center">
+                                                    <i class="bi bi-file-earmark-music-fill text-primary" style="font-size: 2.5rem;"></i>
+                                                </div>
+                                            {% else %}
+                                                <!-- Icono genérico -->
+                                                <div class="text-center">
+                                                    <i class="bi bi-file-earmark-fill text-secondary" style="font-size: 2.5rem;"></i>
+                                                </div>
+                                            {% endif %}
                                         {% else %}
-                                            <!-- Icono genérico -->
-                                            <div class="text-center">
-                                                <i class="bi bi-file-earmark-fill text-secondary" style="font-size: 2.5rem;"></i>
+                                            <!-- Sin archivo -->
+                                            <div class="text-center" title="Sin archivo cargado">
+                                                <i class="bi bi-file-earmark-x text-muted" style="font-size: 2.5rem;"></i>
                                             </div>
                                         {% endif %}
                                     </td>
@@ -136,14 +143,20 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <div class="d-flex flex-column gap-1">
-                                            <a href="{{ evidencia.archivo_evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-success">
-                                                <i class="bi bi-download"></i> Descargar
-                                            </a>
-                                            <small class="text-muted text-truncate" style="max-width: 150px;" title="{{ evidencia.nombre_archivo }}">
-                                                {{ evidencia.nombre_archivo }}
-                                            </small>
-                                        </div>
+                                        {% if evidencia.archivo_evidencia %}
+                                            <div class="d-flex flex-column gap-1">
+                                                <a href="{{ evidencia.archivo_evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-download"></i> Descargar
+                                                </a>
+                                                <small class="text-muted text-truncate" style="max-width: 150px;" title="{{ evidencia.nombre_archivo }}">
+                                                    {{ evidencia.nombre_archivo }}
+                                                </small>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="bi bi-x-circle"></i> Sin archivo
+                                            </span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <div class="btn-group-vertical w-100" role="group">
